@@ -114,7 +114,7 @@ endfunction
 function! s:Teleport()   "{{{1
     call s:EraseCell(s:playerPos)
     let s:playerPos = s:RandomPosition()
-    while index(s:robotsPos, s:playerPos) == 1
+    while index(s:robotsPos, s:playerPos) != -1 || index(s:junkPilesPos, s:playerPos) != -1
         let s:playerPos = s:RandomPosition()
     endwhile
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
