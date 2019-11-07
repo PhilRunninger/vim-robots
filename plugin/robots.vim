@@ -33,14 +33,13 @@ function! s:InitAll()   "{{{1
     nnoremap <buffer> <silent> 1 :call <SID>MovePlayer(1,-1)<CR>
     nnoremap <buffer> <silent> 2 :call <SID>MovePlayer(2, 0)<CR>
     nnoremap <buffer> <silent> 3 :call <SID>MovePlayer(1, 1)<CR>
-    nnoremap <buffer> <silent> 4 :call <SID>MovePlayer(1,-1)<CR>
-    nnoremap <buffer> <silent> 5 :call <SID>MovePlayer(2, 0)<CR>
-    nnoremap <buffer> <silent> 6 :call <SID>MovePlayer(1, 1)<CR>
+    nnoremap <buffer> <silent> 4 <nop>
+    nnoremap <buffer> <silent> 5 :call <SID>MoveRobots()<CR>
+    nnoremap <buffer> <silent> 6 <nop>
     nnoremap <buffer> <silent> 7 :call <SID>MovePlayer(-1,-1)<CR>
     nnoremap <buffer> <silent> 8 :call <SID>MovePlayer(-2, 0)<CR>
     nnoremap <buffer> <silent> 9 :call <SID>MovePlayer(-1, 1)<CR>
-    nnoremap <buffer> <silent> t :call <SID>Teleport()<CR>
-    nnoremap <buffer> <silent> r :call <SID>MoveRobots()<CR>
+    nnoremap <buffer> <silent> <Enter> :call <SID>Teleport()<CR>
 endfunction
 
 function! s:InitRobotsAndPlayer()   "{{{1
