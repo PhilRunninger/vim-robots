@@ -115,34 +115,26 @@ function! s:Teleport()   "{{{1
         let s:playerPos = s:RandomPosition()
     endwhile
     let cell = s:ToScreenPosition(s:playerPos)
+    call s:DrawTeleportDestination(cell, "⟡")
     call s:DrawTeleportDestination(cell, "x")
-    for i in range(3,1,-1)
-        call s:DrawAt(cell, string(i))
-        redraw | sleep 250m
-        call s:EraseCell(s:playerPos)
-        redraw | sleep 250m
-    endfor
     call s:DrawAt(cell, g:robots_player)
+    redraw | sleep 500m
+    call s:DrawTeleportDestination(cell, "⟡")
     call s:DrawTeleportDestination(cell, " ")
-    redraw | sleep 250m
     call s:MoveRobots()
 endfunction
 
-function! s:DrawTeleportDestination(cell, character)
-    let [r,c] = a:cell
-    if c > 2
-        call s:DrawAt([r,c-2], a:character)
-    endif
-    if c < strchars(getline(r))
-        call s:DrawAt([r,c+2], a:character)
-    endif
-    for i in range(-1,1)
-        if r-1 > 2 && c+i > 0 && c+i <= strchars(getline(r-1))
-            call s:DrawAt([r-1,c+i], a:character)
+function! s:DrawTeleportDestination(playerPos, character)   "{{{1
+    let cells = map([[-1,-1],[-1,0],[-1,1],[0,2],[1,1],[1,0],[1,-1],[0,-2]], {_,val -> [val[0]+a:playerPos[0], val[1]+a:playerPos[1]]})
+    let random = map(range(8),{i -> Random(1000000)})
+    for i in range(8)
+        let max = index(random, max(random))
+        let [r,c] = cells[max]
+        let random[max] = -1
+        if r > 2 && r <= line('$') && c > 0 && c <= strchars(getline(r))
+            call s:DrawAt([r,c], a:character)
         endif
-        if r+1 <= line('$') && c+i > 0 && c+i <= strchars(getline(r+1))
-            call s:DrawAt([r+1,c+i], a:character)
-        endif
+        redraw | sleep 25m
     endfor
 endfunction
 
