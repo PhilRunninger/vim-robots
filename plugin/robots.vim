@@ -24,11 +24,8 @@ function! s:InitAll()   "{{{1
     let g:robots_junk_pile = "▲"
     let g:robots_player = "●"
 
-    setlocal filetype=robotsgame
-    setlocal buftype=nofile
-    setlocal bufhidden=wipe
-    setlocal nonumber
-    setlocal nocursorline nocursorcolumn
+    setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
+    setlocal nonumber nolist nocursorline nocursorcolumn
 
     nnoremap <buffer> <silent> 1 :call <SID>MovePlayer(1,-1)<CR>
     nnoremap <buffer> <silent> 2 :call <SID>MovePlayer(2, 0)<CR>
@@ -62,7 +59,7 @@ function! s:DrawGrid()   "{{{1
     setlocal modifiable
     normal! ggdG
     for r in range(1,s:rows,1)
-        call append(0, (r % 2 ? "" : "   ") . trim(repeat("·     ", s:cols/2)))
+        call append(0, strcharpart((r % 2 ? "" : "   ") . repeat("·     ", s:cols/2), 0, getwininfo(win_getid())[0]['width']))
     endfor
     execute 'g/^$/d'
     call append(0, ["ROBOTS    Score: 0",""])
@@ -117,7 +114,36 @@ function! s:Teleport()   "{{{1
     while index(s:robotsPos, s:playerPos) != -1 || index(s:junkPilesPos, s:playerPos) != -1
         let s:playerPos = s:RandomPosition()
     endwhile
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
+    let cell = s:ToScreenPosition(s:playerPos)
+    call s:DrawTeleportDestination(cell, "x")
+    for i in range(3,1,-1)
+        call s:DrawAt(cell, string(i))
+        redraw | sleep 250m
+        call s:EraseCell(s:playerPos)
+        redraw | sleep 250m
+    endfor
+    call s:DrawAt(cell, g:robots_player)
+    call s:DrawTeleportDestination(cell, " ")
+    redraw | sleep 250m
+    call s:MoveRobots()
+endfunction
+
+function! s:DrawTeleportDestination(cell, character)
+    let [r,c] = a:cell
+    if c > 2
+        call s:DrawAt([r,c-2], a:character)
+    endif
+    if c < strchars(getline(r))
+        call s:DrawAt([r,c+2], a:character)
+    endif
+    for i in range(-1,1)
+        if r-1 > 2 && c+i > 0 && c+i <= strchars(getline(r-1))
+            call s:DrawAt([r-1,c+i], a:character)
+        endif
+        if r+1 <= line('$') && c+i > 0 && c+i <= strchars(getline(r+1))
+            call s:DrawAt([r+1,c+i], a:character)
+        endif
+    endfor
 endfunction
 
 function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
