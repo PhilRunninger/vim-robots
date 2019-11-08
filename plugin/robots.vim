@@ -36,7 +36,7 @@ function! s:InitAll()   "{{{1
     nnoremap <buffer> <silent> 7 :call <SID>MovePlayer(-1,-1)<CR>
     nnoremap <buffer> <silent> 8 :call <SID>MovePlayer(-2, 0)<CR>
     nnoremap <buffer> <silent> 9 :call <SID>MovePlayer(-1, 1)<CR>
-    nnoremap <buffer> <silent> <Enter> :call <SID>Teleport()<CR>
+    nnoremap <buffer> <silent> <Enter> :call <SID>Transport()<CR>
 endfunction
 
 function! s:InitRobotsAndPlayer()   "{{{1
@@ -108,33 +108,35 @@ function! s:NewPosition(position, deltaRow, deltaCol)   "{{{1
     endif
 endfunction
 
-function! s:Teleport()   "{{{1
-    call s:EraseCell(s:playerPos)
+function! s:Transport()   "{{{1
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, [" "])
     let s:playerPos = s:RandomPosition()
     while index(s:robotsPos, s:playerPos) != -1 || index(s:junkPilesPos, s:playerPos) != -1
         let s:playerPos = s:RandomPosition()
     endwhile
-    let cell = s:ToScreenPosition(s:playerPos)
-    call s:DrawTeleportDestination(cell, "⟡")
-    call s:DrawTeleportDestination(cell, "x")
-    call s:DrawAt(cell, g:robots_player)
-    redraw | sleep 500m
-    call s:DrawTeleportDestination(cell, "⟡")
-    call s:DrawTeleportDestination(cell, " ")
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["x"], g:robots_player, ["⟡"," "])
     call s:MoveRobots()
 endfunction
 
-function! s:DrawTeleportDestination(playerPos, character)   "{{{1
-    let cells = map([[-1,-1],[-1,0],[-1,1],[0,2],[1,1],[1,0],[1,-1],[0,-2]], {_,val -> [val[0]+a:playerPos[0], val[1]+a:playerPos[1]]})
-    let random = map(range(8),{i -> Random(1000000)})
-    for i in range(8)
-        let max = index(random, max(random))
-        let [r,c] = cells[max]
-        let random[max] = -1
-        if r > 2 && r <= line('$') && c > 0 && c <= strchars(getline(r))
-            call s:DrawAt([r,c], a:character)
-        endif
-        redraw | sleep 25m
+function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
+    let cells = map([[-1,-1],[-1,0],[-1,1],[0,2],[1,1],[1,0],[1,-1],[0,-2]], {_,val -> [val[0]+a:cell[0], val[1]+a:cell[1]]})
+    for sparkles in [a:beamOn, a:beamOff]
+        for sparkle in sparkles
+            let random = map(range(8), {_ -> Random(1000000)})
+            for i in range(8)
+                let max = index(random, max(random))
+                let [r,c] = cells[max]
+                let random[max] = -1
+                if r > 2 && r <= line('$') && c > 0 && c <= strchars(getline(r))
+                    call s:DrawAt([r,c], sparkle)
+                endif
+                redraw
+                sleep 25m
+            endfor
+        endfor
+        call s:DrawAt(a:cell, a:transportee)
+        redraw
+        sleep 100m
     endfor
 endfunction
 
