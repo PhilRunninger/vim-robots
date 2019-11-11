@@ -45,13 +45,13 @@ function! s:InitRobotsAndPlayer()   "{{{1
     let s:robotsPos = []
     for i in range(1,s:robotCount)
         call add(s:robotsPos, s:RandomPosition())
-        while index(s:robotsPos, s:robotsPos[-1]) == 2
+        while count(s:robotsPos, s:robotsPos[-1]) == 2
             let s:robotsPos[-1] = s:RandomPosition()
         endwhile
     endfor
 
     let s:playerPos = s:RandomPosition()
-    while index(s:robotsPos, s:playerPos) == 1
+    while count(s:robotsPos, s:playerPos) == 1
         let s:playerPos = s:RandomPosition()
     endwhile
 endfunction
@@ -116,7 +116,7 @@ endfunction
 function! s:Transport()   "{{{1
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, [" "])
     let s:playerPos = s:RandomPosition()
-    while index(s:robotsPos, s:playerPos) != -1 || index(s:junkPilesPos, s:playerPos) != -1
+    while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
         let s:playerPos = s:RandomPosition()
     endwhile
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["x"], g:robots_player, ["⟡"," "])
@@ -147,7 +147,7 @@ endfunction
 
 function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     let newPos = s:NewPosition(s:playerPos, a:deltaRow, a:deltaCol)
-    if index(s:junkPilesPos,newPos) != -1 || index(s:robotsPos,newPos) != -1 || newPos == s:playerPos
+    if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_empty)
@@ -165,7 +165,7 @@ function! s:MoveRobots()   "{{{1
         let deltaRow *= (deltaCol == 0 ? 2 : 1)
         let deltaCol = (deltaCol == 0 ? 0 : deltaCol/abs(deltaCol))
         let newPos = s:NewPosition(robot, deltaRow, deltaCol)
-        if index(s:junkPilesPos, newPos) == -1
+        if count(s:junkPilesPos, newPos) == 0
             call add(newRobotPos, newPos)
         else
             call s:UpdateScore(1)
@@ -207,8 +207,8 @@ function! s:CheckForGameOver()   "{{{1
         let s:robotCount = float2nr(ceil(s:robotCount * 1.25))
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, ["⟡"," "])
         call s:StartRobots(0)
-    elseif index(s:robotsPos, s:playerPos) != -1
         call popup_dialog("You've been terminated!  Another Game? y/n", options)
+    elseif count(s:robotsPos, s:playerPos) > 0
         let s:robotCount = 2
     endif
 endfunction
