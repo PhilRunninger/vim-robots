@@ -82,10 +82,6 @@ function! s:DrawAll(positions, character)   "{{{1
     endfor
 endfunction
 
-function! s:EraseCell(position)   "{{{1
-    call s:DrawAt(s:ToScreenPosition(a:position), g:robots_empty)
-endfunction
-
 function! s:RandomPosition()   "{{{1
     let r = Random(s:rows)
     let c = 2 * Random(s:cols/2) + (r%2 ? 0:1)
@@ -145,7 +141,7 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     if index(s:junkPilesPos,newPos) != -1 || index(s:robotsPos,newPos) != -1 || newPos == s:playerPos
         return
     endif
-    call s:EraseCell(s:playerPos)
+    call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_empty)
     let s:playerPos = newPos
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
     call s:MoveRobots()
