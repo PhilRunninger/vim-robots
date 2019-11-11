@@ -18,6 +18,7 @@ function! s:InitAll()   "{{{1
 
     let s:cols = 2*((getwininfo(win_getid())[0]['width']+5)/6)
     let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
+    let s:score = 0
     let s:robotCount = 20
     let g:robots_empty = "·"
     let g:robots_robot = "◯"
@@ -62,8 +63,16 @@ function! s:DrawGrid()   "{{{1
         call append(0, strcharpart((r % 2 ? "" : "   ") . repeat("·     ", s:cols/2), 0, getwininfo(win_getid())[0]['width']))
     endfor
     execute 'g/^$/d'
-    call append(0, ["ROBOTS    Score: 0",""])
+    call append(0, ["",""])
+    call s:UpdateScore(0)
     setlocal nomodifiable
+endfunction
+
+function! s:UpdateScore(deltaScore)
+    let s:score += a:deltaScore
+    set modifiable
+    call setline(1, "ROBOTS  Score: ".s:score."  Robots Remaining: ".len(s:robotsPos))
+    set nomodifiable
 endfunction
 
 function! s:DrawAt(position, character)   "{{{1
@@ -158,6 +167,8 @@ function! s:MoveRobots()   "{{{1
         let newPos = s:NewPosition(robot, deltaRow, deltaCol)
         if index(s:junkPilesPos, newPos) == -1
             call add(newRobotPos, newPos)
+        else
+            call s:UpdateScore(1)
         endif
     endfor
 
@@ -187,6 +198,7 @@ function! s:CreateJunkPiles()   "{{{1
         call remove(s:robotsPos,collision)
     endfor
     let s:junkPilesPos = uniq(sort(s:junkPilesPos))
+    call s:UpdateScore(len(collisions))
 endfunction
 
 function! s:CheckForGameOver()   "{{{1
