@@ -10,7 +10,7 @@ function! s:StartRobots(first)   "{{{1
     call s:DrawGrid()
     call s:DrawAll(s:robotsPos, g:robots_robot)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_player, ["⟡"," "])
 endfunction
 
 function! s:InitAll()   "{{{1
@@ -197,7 +197,8 @@ function! s:CheckForGameOver()   "{{{1
     let options = #{filter:"popup_filter_yesno", callback:"PlayAnother"}
     if len(s:robotsPos) == 0
         let s:robotCount = float2nr(ceil(s:robotCount * 1.25))
-        call popup_dialog("You Won!  Another Game? y/n", options)
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, ["⟡"," "])
+        call s:StartRobots(0)
     elseif index(s:robotsPos, s:playerPos) != -1
         let s:robotCount = 20
         call popup_dialog("You've been terminated!  Another Game? y/n", options)
@@ -206,6 +207,7 @@ endfunction
 
 function! PlayAnother(id, result)   "{{{1
     if a:result
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, ["⟡"," "])
         call s:StartRobots(0)
     else
         bwipeout
