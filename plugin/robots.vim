@@ -10,7 +10,7 @@ function! s:StartRobots(first)   "{{{1
     call s:DrawGrid()
     call s:DrawAll(s:robotsPos, g:robots_robot)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_player, ["⟡"," "])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
 endfunction
 
 function! s:InitAll()   "{{{1
@@ -114,12 +114,12 @@ function! s:NewPosition(position, deltaRow, deltaCol)   "{{{1
 endfunction
 
 function! s:Transport()   "{{{1
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, [" "])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
     let s:playerPos = s:RandomPosition()
     while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
         let s:playerPos = s:RandomPosition()
     endwhile
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["x"], g:robots_player, ["⟡"," "])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
     call s:MoveRobots()
 endfunction
 
@@ -204,9 +204,10 @@ endfunction
 function! s:CheckForGameOver()   "{{{1
     if len(s:robotsPos) == 0
         let s:robotCount = float2nr(ceil(s:robotCount * 1.25))
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, ["⟡"," "])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
         call s:StartRobots(0)
     elseif count(s:robotsPos, s:playerPos) > 0
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], "X", ["x"])
         let s:robotCount = 2
         call popup_dialog("You've been terminated!  Another Game? y/n", #{filter:"popup_filter_yesno", callback:"PlayAnother"})
     endif
@@ -214,7 +215,7 @@ endfunction
 
 function! PlayAnother(id, result)   "{{{1
     if a:result
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, ["⟡"," "])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
         call s:StartRobots(0)
     else
         bwipeout
