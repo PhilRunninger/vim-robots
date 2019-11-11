@@ -21,7 +21,7 @@ function! s:InitAll()   "{{{1
     let s:score = 0
     let s:robotCount = 2
     let g:robots_empty = "·"
-    let g:robots_robot = "◯"
+    let g:robots_robot = "■"
     let g:robots_junk_pile = "▲"
     let g:robots_player = "●"
 
