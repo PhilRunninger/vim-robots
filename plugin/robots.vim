@@ -19,7 +19,7 @@ function! s:InitAll()   "{{{1
     let s:cols = 2*((getwininfo(win_getid())[0]['width']+5)/6)
     let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
     let s:score = 0
-    let s:robotCount = 20
+    let s:robotCount = 2
     let g:robots_empty = "·"
     let g:robots_robot = "◯"
     let g:robots_junk_pile = "▲"
@@ -208,8 +208,8 @@ function! s:CheckForGameOver()   "{{{1
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["⟡","x"], g:robots_empty, ["⟡"," "])
         call s:StartRobots(0)
     elseif index(s:robotsPos, s:playerPos) != -1
-        let s:robotCount = 20
         call popup_dialog("You've been terminated!  Another Game? y/n", options)
+        let s:robotCount = 2
     endif
 endfunction
 
