@@ -7,7 +7,7 @@ There is one key difference between the classic game and this modern Vim update.
 
 ![Cartesian Robots screenshot](https://upload.wikimedia.org/wikipedia/commons/b/bf/Robots_text_screenshot.png)
 
-but this rendition is based on a hexagonal grid, with movement in only 6 directions.
+but this rendition is based on a hexagonal grid, with movement in only 6 directions. *The hexagons are overlayed for illustration only. Kudos to anyone who modifies their terminal background to be tiled hexagons.*
 
 ![Hex Robots screenshot](https://github.com/PhilRunninger/vim-robots/raw/master/HexRobots.png)
 
