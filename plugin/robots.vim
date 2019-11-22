@@ -19,7 +19,7 @@ function! s:InitAll()   "{{{1
     let s:cols = 2*((getwininfo(win_getid())[0]['width']+5)/6)
     let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
     let s:score = 0
-    let s:robotCount = 2
+    let s:round = 0
     let g:robots_empty = "·"
     let g:robots_robot = "■"
     let g:robots_junk_pile = "▲"
@@ -40,10 +40,15 @@ function! s:InitAll()   "{{{1
     nnoremap <buffer> <silent> <Enter> :call <SID>Transport()<CR>
 endfunction
 
+function s:RobotCount()   "{{{1
+    " https://en.wikipedia.org/wiki/Logistic_function
+    return float2nr(0.5 * (s:rows * s:cols / 2) / (1 + exp(-0.33*(s:round - 13))))
+endfunction
+
 function! s:InitRobotsAndPlayer()   "{{{1
     let s:junkPilesPos = []
     let s:robotsPos = []
-    for i in range(1,s:robotCount)
+    for i in range(1,s:RobotCount())
         call add(s:robotsPos, s:RandomPosition())
         while count(s:robotsPos, s:robotsPos[-1]) == 2
             let s:robotsPos[-1] = s:RandomPosition()
@@ -203,10 +208,10 @@ endfunction
 function! s:CheckForGameOver()   "{{{1
     if count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], "X", ["x"])
-        let s:robotCount = 2
+        let s:round = 0
         call popup_dialog("You've been terminated!  Another Game? y/n", #{filter:"popup_filter_yesno", callback:"PlayAnother"})
     elseif len(s:robotsPos) == 0
-        let s:robotCount = float2nr(ceil(s:robotCount * 1.25))
+        let s:round += 1
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
         call s:StartRobots(0)
     endif
