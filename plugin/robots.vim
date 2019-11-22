@@ -70,9 +70,9 @@ endfunction
 
 function! s:UpdateScore(deltaScore)
     let s:score += a:deltaScore
-    set modifiable
+    setlocal modifiable
     call setline(1, "ROBOTS  Score: ".s:score."  Robots Remaining: ".len(s:robotsPos))
-    set nomodifiable
+    setlocal nomodifiable
 endfunction
 
 function! s:DrawAt(position, character)   "{{{1
