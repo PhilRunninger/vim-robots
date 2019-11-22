@@ -120,7 +120,6 @@ function! s:Transport()   "{{{1
         let s:playerPos = s:RandomPosition()
     endwhile
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
-    call s:MoveRobots()
 endfunction
 
 function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
