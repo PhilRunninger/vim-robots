@@ -165,7 +165,7 @@ function! s:MoveRobots()   "{{{1
     for robot in s:robotsPos
         let deltaRow = s:playerPos[0] - robot[0]
         let deltaCol = s:playerPos[1] - robot[1]
-        let deltaRow = (deltaRow == 0 ? 2*Random(2)-1 : deltaRow/abs(deltaRow))
+        let deltaRow = (deltaRow == 0 ? (robot[0]==0 ? 1 : (robot[0]==s:rows-1 ? -1 : 2*Random(2)-1)) : deltaRow/abs(deltaRow))
         let deltaRow *= (deltaCol == 0 ? 2 : 1)
         let deltaCol = (deltaCol == 0 ? 0 : deltaCol/abs(deltaCol))
         let newPos = s:NewPosition(robot, deltaRow, deltaCol)
