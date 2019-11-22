@@ -201,14 +201,14 @@ function! s:CreateJunkPiles()   "{{{1
 endfunction
 
 function! s:CheckForGameOver()   "{{{1
-    if len(s:robotsPos) == 0
-        let s:robotCount = float2nr(ceil(s:robotCount * 1.25))
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
-        call s:StartRobots(0)
-    elseif count(s:robotsPos, s:playerPos) > 0
+    if count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], "X", ["x"])
         let s:robotCount = 2
         call popup_dialog("You've been terminated!  Another Game? y/n", #{filter:"popup_filter_yesno", callback:"PlayAnother"})
+    elseif len(s:robotsPos) == 0
+        let s:robotCount = float2nr(ceil(s:robotCount * 1.25))
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
+        call s:StartRobots(0)
     endif
 endfunction
 
