@@ -34,6 +34,7 @@ function! s:StartNewGame()   "{{{1
     let s:score = 0
     let s:round = -1
     let s:safeTransports = 0
+    let s:bonus = 0
     call s:StartNewRound()
 endfunction
 
