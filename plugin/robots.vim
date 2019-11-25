@@ -1,29 +1,16 @@
 " vim: foldmethod=marker
 
-command! Robots :call <SID>StartRobots(1)   "{{{1
+command! Robots :call <SID>InitAndStartRobots()   "{{{1
 
-function! s:StartRobots(first)   "{{{1
-    if a:first
-        call s:InitAll()
-    endif
-    call s:InitRobotsAndPlayer()
-    call s:DrawGrid()
-    call s:DrawAll(s:robotsPos, g:robots_robot)
-    call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
-endfunction
-
-function! s:InitAll()   "{{{1
-    tabnew
-
-    let s:cols = 2*((getwininfo(win_getid())[0]['width']+5)/6)
-    let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
-    let s:score = 0
-    let s:round = 0
+function! s:InitAndStartRobots()   "{{{1
     let g:robots_empty = "·"
     let g:robots_robot = "■"
     let g:robots_junk_pile = "▲"
     let g:robots_player = "●"
+
+    tabnew
+    let s:cols = 2*((getwininfo(win_getid())[0]['width']+5)/6)
+    let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
     setlocal nonumber nolist nocursorline nocursorcolumn
@@ -38,6 +25,24 @@ function! s:InitAll()   "{{{1
     nnoremap <buffer> <silent> 6 <nop>
     nnoremap <buffer> <silent> w :call <SID>MoveRobots()<CR>    " Wait
     nnoremap <buffer> <silent> t :call <SID>Transport()<CR>     " Transport
+
+    call s:StartNewGame()
+endfunction
+
+function! s:StartNewGame()   "{{{1
+    let s:score = 0
+    let s:round = -1
+    call s:StartNewRound()
+endfunction
+
+function! s:StartNewRound()   "{{{1
+    let s:round += 1
+    let s:bonus = 0
+    call s:CreateRobotsAndPlayer()
+    call s:DrawGrid()
+    call s:DrawAll(s:robotsPos, g:robots_robot)
+    call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
 endfunction
 
 function s:RobotCount()   "{{{1
@@ -45,7 +50,7 @@ function s:RobotCount()   "{{{1
     return float2nr(0.5 * (s:rows * s:cols / 2) / (1 + exp(-0.33*(s:round - 13))))
 endfunction
 
-function! s:InitRobotsAndPlayer()   "{{{1
+function! s:CreateRobotsAndPlayer()   "{{{1
     let s:junkPilesPos = []
     let s:robotsPos = []
     for i in range(1,s:RobotCount())
@@ -73,7 +78,7 @@ function! s:DrawGrid()   "{{{1
     setlocal nomodifiable
 endfunction
 
-function! s:UpdateScore(deltaScore)
+function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
     call setline(1, "ROBOTS  Score: ".s:score."  Robots Remaining: ".len(s:robotsPos))
@@ -208,19 +213,17 @@ endfunction
 function! s:CheckForGameOver()   "{{{1
     if count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], "X", ["x"])
-        let s:round = 0
         call popup_dialog("You've been terminated!  Another Game? y/n", #{filter:"popup_filter_yesno", callback:"PlayAnother"})
     elseif len(s:robotsPos) == 0
-        let s:round += 1
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
-        call s:StartRobots(0)
+        call s:StartNewRound()
     endif
 endfunction
 
 function! PlayAnother(id, result)   "{{{1
     if a:result
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
-        call s:StartRobots(0)
+        call s:StartNewGame()
     else
         bwipeout
     endif
