@@ -3,10 +3,10 @@
 command! Robots :call <SID>InitAndStartRobots()   "{{{1
 
 function! s:InitAndStartRobots()   "{{{1
-    let g:robots_empty = "·"
-    let g:robots_robot = "■"
-    let g:robots_junk_pile = "▲"
-    let g:robots_player = "●"
+    let g:robots_empty = '·'
+    let g:robots_robot = '■'
+    let g:robots_junk_pile = '▲'
+    let g:robots_player = '●'
 
     tabnew
     let s:cols = 2*((getwininfo(win_getid())[0]['width']+5)/6)
@@ -46,7 +46,7 @@ function! s:StartNewRound()   "{{{1
     call s:DrawGrid()
     call s:DrawAll(s:robotsPos, g:robots_robot)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
 endfunction
 
 function s:RobotCount()   "{{{1
@@ -74,10 +74,10 @@ function! s:DrawGrid()   "{{{1
     setlocal modifiable
     normal! ggdG
     for r in range(1,s:rows,1)
-        call append(0, strcharpart((r % 2 ? "" : "   ") . repeat("·     ", s:cols/2), 0, getwininfo(win_getid())[0]['width']))
+        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat('·     ', s:cols/2), 0, getwininfo(win_getid())[0]['width']))
     endfor
     execute 'g/^$/d'
-    call append(0, ["",""])
+    call append(0, ['',''])
     call s:UpdateScore(0)
     setlocal nomodifiable
 endfunction
@@ -85,7 +85,7 @@ endfunction
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
-    call setline(1, "ROBOTS  Score: ".s:score."  Robots Remaining: ".len(s:robotsPos)."  Safe Transports: ".s:safeTransports)
+    call setline(1, 'ROBOTS  Score: '.s:score.'  Robots Remaining: '.len(s:robotsPos).'  Safe Transports: '.s:safeTransports)
     setlocal nomodifiable
 endfunction
 
@@ -128,7 +128,7 @@ function! s:NewPosition(position, deltaRow, deltaCol)   "{{{1
 endfunction
 
 function! s:Transport()   "{{{1
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
     let s:playerPos = s:RandomPosition()
     if s:safeTransports > 0
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
@@ -136,7 +136,7 @@ function! s:Transport()   "{{{1
         endwhile
         let s:safeTransports -= 1
     endif
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
     call s:UpdateScore(0)
     call s:Continue()
 endfunction
@@ -249,7 +249,7 @@ endfunction
 
 function! PlayAnother(id, result)   "{{{1
     if a:result
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
         call s:StartNewGame()
     else
         bwipeout
