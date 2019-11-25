@@ -138,15 +138,17 @@ function! s:Transport()   "{{{1
     endif
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✶"], g:robots_player, ["★","✦"," "])
     call s:UpdateScore(0)
-    call s:CheckForGameOver()
+    call s:Continue()
 endfunction
 
 function! s:FinishRound()   "{{{1
     let s:bonus = len(s:robotsPos)
-    while s:MoveRobots()
+    while !s:PlayerWinsRound() && !s:GameOver()
+        call s:MoveRobots()
         redraw
-        sleep 250m
+        sleep 100m
     endwhile
+    call s:Continue()
 endfunction
 
 function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
@@ -180,6 +182,7 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     let s:playerPos = newPos
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
     call s:MoveRobots()
+    call s:Continue()
 endfunction
 
 function! s:MoveRobots()   "{{{1
@@ -203,7 +206,6 @@ function! s:MoveRobots()   "{{{1
     call s:DrawAll(s:robotsPos, g:robots_robot)
     call s:CreateJunkPiles()
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
-    return s:CheckForGameOver()
 endfunction
 
 function! s:CreateJunkPiles()   "{{{1
@@ -227,17 +229,22 @@ function! s:CreateJunkPiles()   "{{{1
     call s:UpdateScore(len(collisions))
 endfunction
 
-function! s:CheckForGameOver()   "{{{1
-    if count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], "X", ["x"])
-        call popup_dialog("You've been terminated!  Another Game? y/n", #{filter:"popup_filter_yesno", callback:"PlayAnother"})
-        return 0
-    elseif len(s:robotsPos) == 0
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ["✦","★","✶"], g:robots_empty, [" "])
+function! s:GameOver()   "{{{1
+    return count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
+endfunction
+
+function! s:PlayerWinsRound()   "{{{1
+    return len(s:robotsPos) == 0
+endfunction
+
+function! s:Continue()   "{{{1
+    if s:GameOver()
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['x'])
+        call popup_dialog("You've been terminated!  Another Game? y/n", #{filter:'popup_filter_yesno', callback:'PlayAnother'})
+    elseif s:PlayerWinsRound()
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
         call s:StartNewRound()
-        return 0
     endif
-    return 1
 endfunction
 
 function! PlayAnother(id, result)   "{{{1
