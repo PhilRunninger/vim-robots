@@ -28,16 +28,16 @@ function! s:InitAll()   "{{{1
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
     setlocal nonumber nolist nocursorline nocursorcolumn
 
-    nnoremap <buffer> <silent> 1 :call <SID>MovePlayer(1,-1)<CR>
-    nnoremap <buffer> <silent> 2 :call <SID>MovePlayer(2, 0)<CR>
-    nnoremap <buffer> <silent> 3 :call <SID>MovePlayer(1, 1)<CR>
+    for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
+        for key in keys
+            call execute('nnoremap <buffer> <nowait> <silent> '.key.' :call <SID>MovePlayer('.deltaRow.','.deltaCol.')<CR>')
+        endfor
+    endfor
     nnoremap <buffer> <silent> 4 <nop>
-    nnoremap <buffer> <silent> 5 :call <SID>MoveRobots()<CR>
+    nnoremap <buffer> <silent> 5 <nop>
     nnoremap <buffer> <silent> 6 <nop>
-    nnoremap <buffer> <silent> 7 :call <SID>MovePlayer(-1,-1)<CR>
-    nnoremap <buffer> <silent> 8 :call <SID>MovePlayer(-2, 0)<CR>
-    nnoremap <buffer> <silent> 9 :call <SID>MovePlayer(-1, 1)<CR>
-    nnoremap <buffer> <silent> <Enter> :call <SID>Transport()<CR>
+    nnoremap <buffer> <silent> w :call <SID>MoveRobots()<CR>    " Wait
+    nnoremap <buffer> <silent> t :call <SID>Transport()<CR>     " Transport
 endfunction
 
 function s:RobotCount()   "{{{1
