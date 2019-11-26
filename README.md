@@ -7,7 +7,7 @@ There is one key difference between the classic game and this modern Vim update.
 
 ![Cartesian Robots screenshot](https://upload.wikimedia.org/wikipedia/commons/b/bf/Robots_text_screenshot.png)
 
-but this rendition is based on a hexagonal grid, with movement in only 6 directions. *The hexagons are overlayed for illustration only. Kudos to anyone who modifies their terminal background to be tiled hexagons.*
+but this rendition is based on a hexagonal grid, with movement in only 6 directions. *The hexagons in the picture below are for illustration only, and not part of the game. Kudos to anyone who modifies their terminal background to be tiled hexagons.*
 
 ![Hex Robots screenshot](https://github.com/PhilRunninger/vim-robots/raw/master/HexRobots.png)
 
@@ -15,28 +15,24 @@ but this rendition is based on a hexagonal grid, with movement in only 6 directi
 
 Start a game with the `:Robots` command.
 
-Move your player around the screen with these keys (the number keypad works best):
+Move your player around the screen with these keys:
 
-Key | Direction
----|---
-7 | Up left
-8 | Up
-9 | Up right
-1 | Down left
-2 | Down
-3 | Down right
+Main Keyboard | Number Keypad | Direction
+---|---|---
+`y` | `7` | Up left
+`k` | `8` | Up
+`u` | `9` | Up right
+`b` | `1` | Down left
+`j` | `2` | Down
+`n` | `3` | Down right
 
 Other keys that can be used:
 
 Key | Function
 ---|---
-5 | Rest for one move, and let the robots advance
-Enter | Teleport to another location
+`w` | Wait for one move, and let the robots advance
+`t` | Transport to another location
+`f` | Finish the round. Wait until defeat or triumph.
 
-## ToDo
-Lots of stuff. This is still a work in progress.
-- Bug fixes
-- Key mapping to rest until a win or death
-- Safe Teleports
-- Non-keypad mappings (useful on laptop keyboards)
-- Refactoring
+## Safe Transports
+A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the `f` key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating ten robots earns you one safe transport.
