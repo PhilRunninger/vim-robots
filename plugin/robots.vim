@@ -51,7 +51,8 @@ endfunction
 
 function s:RobotCount()   "{{{1
     " https://en.wikipedia.org/wiki/Logistic_function
-    return float2nr(0.5 * (s:rows * s:cols / 2) / (1 + exp(-0.33*(s:round - 13))))
+    let l:count = float2nr(0.5 * (s:rows * s:cols / 2) / (1 + exp(-0.33*(s:round - 13))))
+    return max([2,l:count])
 endfunction
 
 function! s:CreateRobotsAndPlayer()   "{{{1
@@ -85,7 +86,7 @@ endfunction
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
-    call setline(1, 'ROBOTS  Round: '.(s:round+1).'  Score: '.s:score.'  Robots Remaining: '.len(s:robotsPos).'  Safe Transports: '.printf("%5.1f", s:safeTransports))
+    call setline(1, 'ROBOTS  Round: '.(s:round+1).'  Score: '.s:score.'  Robots Remaining: '.len(s:robotsPos).'  Safe Transports: '.string(s:safeTransports))
     setlocal nomodifiable
 endfunction
 
