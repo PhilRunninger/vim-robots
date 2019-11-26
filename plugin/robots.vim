@@ -34,14 +34,12 @@ function! s:StartNewGame()   "{{{1
     let s:score = 0
     let s:round = -1
     let s:safeTransports = 0.0
-    let s:bonus = 0.0
     call s:StartNewRound()
 endfunction
 
 function! s:StartNewRound()   "{{{1
     let s:round += 1
-    let s:safeTransports += s:bonus
-    let s:bonus = 0.0
+    let s:finishingRound = 0
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
     call s:DrawAll(s:robotsPos, g:robots_robot)
@@ -143,7 +141,7 @@ function! s:Transport()   "{{{1
 endfunction
 
 function! s:FinishRound()   "{{{1
-    let s:bonus = len(s:robotsPos)/10.0
+    let s:finishingRound = 1
     while !s:PlayerWinsRound() && !s:GameOver()
         call s:MoveRobots()
         redraw
@@ -199,6 +197,9 @@ function! s:MoveRobots()   "{{{1
             call add(newRobotPos, newPos)
         else
             call s:UpdateScore(1)
+            if s:finishingRound
+                let s:safeTransports += 0.1
+            endif
         endif
     endfor
 
