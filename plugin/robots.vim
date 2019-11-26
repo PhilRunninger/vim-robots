@@ -33,15 +33,15 @@ endfunction
 function! s:StartNewGame()   "{{{1
     let s:score = 0
     let s:round = -1
-    let s:safeTransports = 0
-    let s:bonus = 0
+    let s:safeTransports = 0.0
+    let s:bonus = 0.0
     call s:StartNewRound()
 endfunction
 
 function! s:StartNewRound()   "{{{1
     let s:round += 1
     let s:safeTransports += s:bonus
-    let s:bonus = 0
+    let s:bonus = 0.0
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
     call s:DrawAll(s:robotsPos, g:robots_robot)
@@ -85,7 +85,7 @@ endfunction
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
-    call setline(1, 'ROBOTS  Score: '.s:score.'  Robots Remaining: '.len(s:robotsPos).'  Safe Transports: '.s:safeTransports)
+    call setline(1, 'ROBOTS  Round: '.(s:round+1).'  Score: '.s:score.'  Robots Remaining: '.len(s:robotsPos).'  Safe Transports: '.printf("%5.1f", s:safeTransports))
     setlocal nomodifiable
 endfunction
 
@@ -130,11 +130,11 @@ endfunction
 function! s:Transport()   "{{{1
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
     let s:playerPos = s:RandomPosition()
-    if s:safeTransports > 0
+    if s:safeTransports >= 1.0
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
             let s:playerPos = s:RandomPosition()
         endwhile
-        let s:safeTransports -= 1
+        let s:safeTransports -= 1.0
     endif
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
     call s:UpdateScore(0)
@@ -142,7 +142,7 @@ function! s:Transport()   "{{{1
 endfunction
 
 function! s:FinishRound()   "{{{1
-    let s:bonus = len(s:robotsPos)
+    let s:bonus = len(s:robotsPos)/10.0
     while !s:PlayerWinsRound() && !s:GameOver()
         call s:MoveRobots()
         redraw
