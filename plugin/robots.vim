@@ -13,7 +13,7 @@ function! s:InitAndStartRobots()   "{{{1
     let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
-    setlocal nonumber nolist nocursorline nocursorcolumn
+    setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn
 
     for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
         for key in keys
@@ -78,6 +78,7 @@ function! s:DrawGrid()   "{{{1
     execute 'g/^$/d'
     call append(0, ['',''])
     call s:UpdateScore(0)
+    normal! gg
     setlocal nomodifiable
 endfunction
 
