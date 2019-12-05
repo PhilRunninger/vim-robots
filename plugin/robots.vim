@@ -23,7 +23,7 @@ function! s:InitAndStartRobots()   "{{{1
     nnoremap <buffer> <silent> 4 <nop>
     nnoremap <buffer> <silent> 5 <nop>
     nnoremap <buffer> <silent> 6 <nop>
-    nnoremap <buffer> <silent> w :call <SID>MoveRobots()<CR>
+    nnoremap <buffer> <silent> w :call <SID>WaitOneTurn()<CR>
     nnoremap <buffer> <silent> t :call <SID>Transport()<CR>
     nnoremap <buffer> <silent> f :call <SID>FinishRound()<CR>
     nnoremap <buffer> <silent> <Esc> :tabprevious<CR>
@@ -126,6 +126,11 @@ function! s:NewPosition(position, deltaRow, deltaCol)   "{{{1
     else
         return [r,c]
     endif
+endfunction
+
+function! s:WaitOneTurn()   "{{{1
+    call s:MoveRobots()
+    call s:Continue()
 endfunction
 
 function! s:Transport()   "{{{1
