@@ -141,6 +141,8 @@ function! s:Transport()   "{{{1
             let s:playerPos = s:RandomPosition()
         endwhile
         let s:safeTransports -= 1.0
+    else
+        let s:safeTransports = 0.0
     endif
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
     call s:UpdateScore(0)
