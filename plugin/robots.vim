@@ -26,6 +26,7 @@ function! s:InitAndStartRobots()   "{{{1
     nnoremap <buffer> <silent> w :call <SID>MoveRobots()<CR>
     nnoremap <buffer> <silent> t :call <SID>Transport()<CR>
     nnoremap <buffer> <silent> f :call <SID>FinishRound()<CR>
+    nnoremap <buffer> <silent> <Esc> :tabprevious<CR>
 
     call s:StartNewGame()
 endfunction
