@@ -205,10 +205,10 @@ function! s:MoveRobots()   "{{{1
         if count(s:junkPilesPos, newPos) == 0
             call add(newRobotPos, newPos)
         else
-            call s:UpdateScore(1)
             if s:finishingRound
                 let s:safeTransports += 0.1
             endif
+            call s:UpdateScore(1)
         endif
     endfor
 
@@ -235,6 +235,9 @@ function! s:CreateJunkPiles()   "{{{1
     for collision in collisions
         call add(s:junkPilesPos, s:robotsPos[collision])
         call remove(s:robotsPos,collision)
+        if s:finishingRound
+            let s:safeTransports += 0.1
+        endif
     endfor
     let s:junkPilesPos = uniq(sort(s:junkPilesPos))
     call s:UpdateScore(len(collisions))
