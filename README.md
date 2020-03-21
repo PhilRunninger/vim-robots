@@ -15,6 +15,8 @@ but this rendition is based on a hexagonal grid, with movement in only 6 directi
 
 Start a game with the `:Robots` command.
 
+Your player is indicated by the green circle. Robots are pink squares, and the junk piles are orange triangles. Depending on your terminal color settings, your colors may vary.
+
 Move your player around the screen with these keys:
 
 Main Keyboard | Number Keypad | Direction
