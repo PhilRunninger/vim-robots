@@ -34,7 +34,7 @@ Key | Function
 ---|---
 `w` | Wait for one move, and let the robots advance
 `t` | Transport to another location
-`f` | Finish the round. Wait until defeat or triumph.
+`F` | Finish the round. Wait until defeat or triumph.
 
 ## Safe Transports
 A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the `f` key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating ten robots earns you one safe transport.
