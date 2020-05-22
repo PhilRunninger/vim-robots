@@ -48,7 +48,7 @@ function! s:StartNewRound()   "{{{1
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
 endfunction
 
-function s:RobotCount()   "{{{1
+function! s:RobotCount()   "{{{1
     " https://en.wikipedia.org/wiki/Logistic_function
     let l:count = float2nr(0.5 * (s:rows * s:cols / 2) / (1 + exp(-0.33*(s:round - 13))))
     return max([2,l:count])
@@ -199,7 +199,7 @@ function! s:MoveRobots()   "{{{1
         let deltaRow = s:playerPos[0] - robot[0]
         let deltaCol = s:playerPos[1] - robot[1]
         let deltaRow = (deltaRow == 0 ? (robot[0]==0 ? 1 : (robot[0]==s:rows-1 ? -1 : 2*Random(2)-1)) : deltaRow/abs(deltaRow))
-        let deltaRow *= (deltaCol == 0 ? 2 : 1)
+        let deltaRow = deltaRow * (deltaCol == 0 ? 2 : 1)
         let deltaCol = (deltaCol == 0 ? 0 : deltaCol/abs(deltaCol))
         let newPos = s:NewPosition(robot, deltaRow, deltaCol)
         if count(s:junkPilesPos, newPos) == 0
@@ -254,15 +254,15 @@ endfunction
 function! s:Continue()   "{{{1
     if s:GameOver()
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['x'])
-        call popup_dialog("You've been terminated!  Another Game? y/n", #{filter:'popup_filter_yesno', callback:'PlayAnother'})
+        call s:PlayAnother(confirm("You've been terminated!  Another Game? ", "&Yes\n&No"))
     elseif s:PlayerWinsRound()
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
         call s:StartNewRound()
     endif
 endfunction
 
-function! PlayAnother(id, result)   "{{{1
-    if a:result
+function! s:PlayAnother(result)   "{{{1
+    if a:result == 1
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
         call s:StartNewGame()
     else
