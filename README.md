@@ -8,7 +8,7 @@ There is one key difference between the classic game and this modern Vim update.
 ![Robots on Cartesian grid](https://upload.wikimedia.org/wikipedia/commons/b/bf/Robots_text_screenshot.png)
 <br/>**Figure 1:** *Robots on Cartesian grid*
 
-but this reincarnation is based on a hexagonal grid, with movement in only 6 directions. *The hexagons in the picture below are for illustration only, and not part of the game.*
+but this reincarnation is based on a hexagonal grid, with movement in only 6 directions. *Note: the hexagons in the picture below are for illustration only, and obviously are not part of the game.*
 
 ![Robots on a hexagonal grid](https://github.com/PhilRunninger/vim-robots/raw/master/HexRobots.png)
 <br/>**Figure 2:** *Robots on a hexagonal grid*
@@ -17,9 +17,10 @@ but this reincarnation is based on a hexagonal grid, with movement in only 6 dir
 
 Start a game with the `:Robots` command.
 
-Your player is indicated by the green circle. Robots are pink squares, and the junk piles are orange triangles. Your colors may vary, depending on your Vim colorscheme and/or terminal color settings.
+Your player is the circle. Robots are squares, and the junk piles are triangles. *Your colors will vary, depending on your Vim colorscheme and/or terminal color settings.* Your objective is to get all the robots to crash into each or a junk pile, while avoiding capture, so you can advance to the next round.
 
-Move your player around the screen with these keys:
+### Movement
+Move your player around the screen with these keys.
 
 Main Keyboard | Number Keypad | Direction
 ---|---|---
@@ -30,13 +31,13 @@ Main Keyboard | Number Keypad | Direction
 `j` | `2` | Down
 `n` | `3` | Down right
 
-Other keys that can be used:
+To get out of a bind or to earn a bonus, use these keys.
 
 Key | Function
 ---|---
-`w` | Wait for one move, and let the robots advance
-`t` | Transport to another location
+`t` | Transport to another location when you have nowhere else to go.
+`w` | Wait for one move, and let the robots advance.
 `F` | Finish the round. Wait until defeat or triumph.
 
-## Safe Transports
-A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the `f` key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating ten robots earns you one safe transport.
+### Safe Transports
+A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the `F` key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating ten robots earns you one safe transport.
