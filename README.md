@@ -5,17 +5,19 @@ This is a Vim plugin implementation of the classic game. Check out the [Wikipedi
 
 There is one key difference between the classic game and this modern Vim update. The original version is based on a Cartesian grid, with movement in the usual 8 directions,...
 
-![Cartesian Robots screenshot](https://upload.wikimedia.org/wikipedia/commons/b/bf/Robots_text_screenshot.png)
+![Robots on Cartesian grid](https://upload.wikimedia.org/wikipedia/commons/b/bf/Robots_text_screenshot.png)
+<br/>**Figure 1:** *Robots on Cartesian grid*
 
-but this rendition is based on a hexagonal grid, with movement in only 6 directions. *The hexagons in the picture below are for illustration only, and not part of the game. Kudos to anyone who modifies their terminal background to be tiled hexagons.*
+but this reincarnation is based on a hexagonal grid, with movement in only 6 directions. *The hexagons in the picture below are for illustration only, and not part of the game.*
 
-![Hex Robots screenshot](https://github.com/PhilRunninger/vim-robots/raw/master/HexRobots.png)
+![Robots on a hexagonal grid](https://github.com/PhilRunninger/vim-robots/raw/master/HexRobots.png)
+<br/>**Figure 2:** *Robots on a hexagonal grid*
 
 ## Playing the game
 
 Start a game with the `:Robots` command.
 
-Your player is indicated by the green circle. Robots are pink squares, and the junk piles are orange triangles. Depending on your terminal color settings, your colors may vary.
+Your player is indicated by the green circle. Robots are pink squares, and the junk piles are orange triangles. Your colors may vary, depending on your Vim colorscheme and/or terminal color settings.
 
 Move your player around the screen with these keys:
 
