@@ -9,7 +9,7 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_player = '●'
 
     tabnew
-    let s:cols = 2*((getwininfo(win_getid())[0]['width']+5)/6)
+    let s:cols = (getwininfo(win_getid())[0]['width']+2)/3
     let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
@@ -75,7 +75,7 @@ function! s:DrawGrid()   "{{{1
     setlocal modifiable
     normal! ggdG
     for r in range(1,s:rows,1)
-        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat('·     ', s:cols/2), 0, getwininfo(win_getid())[0]['width']))
+        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat('·     ', s:cols), 0, getwininfo(win_getid())[0]['width']))
     endfor
     execute 'g/^$/d'
     call append(0, ['',''])
