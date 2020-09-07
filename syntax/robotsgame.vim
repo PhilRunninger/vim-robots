@@ -8,6 +8,7 @@ syntax match RobotsPlayerDeath1 /x/
 syntax match RobotsPlayerDeath2 /X/
 syntax match RobotsTitle /ROBOTS/
 syntax match RobotsNumbers /\d\+/
+syntax match RobotsGameOver /You've been.*/
 
 highlight RobotsRobot cterm=bold ctermfg=165
 highlight RobotsPlayer cterm=bold ctermfg=40
@@ -19,3 +20,4 @@ highlight RobotsSafeTransport cterm=bold ctermfg=40
 highlight RobotsRiskyTransport cterm=bold ctermfg=196
 highlight RobotsTitle cterm=bold ctermfg=214
 highlight RobotsNumbers cterm=bold ctermfg=220
+highlight RobotsGameOver cterm=bold ctermfg=196

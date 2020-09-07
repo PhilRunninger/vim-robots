@@ -263,15 +263,19 @@ endfunction
 function! s:Continue()   "{{{1
     if s:GameOver()
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['x'])
-        call s:PlayAnother(confirm("You've been terminated!  Another Game? ", "&Yes\n&No"))
+        call s:PlayAnother()
     elseif s:PlayerWinsRound()
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
         call s:StartNewRound()
     endif
 endfunction
 
-function! s:PlayAnother(result)   "{{{1
-    if a:result == 1
+function! s:PlayAnother()   "{{{1
+    setlocal modifiable
+    call setline(2, "You've been terminated! Another game? [Y]es/(N)o:")
+    setlocal nomodifiable
+    redraw!
+    if nr2char(getchar()) !=? 'n'
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
         call s:StartNewGame()
     else
