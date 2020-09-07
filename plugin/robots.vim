@@ -7,6 +7,8 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_robot = '■'
     let g:robots_junk_pile = '▲'
     let g:robots_player = '●'
+    let g:robots_safe = '◎'
+    let g:robots_risky = '∙'
 
     tabnew
     let s:cols = (getwininfo(win_getid())[0]['width']+2)/3
@@ -87,7 +89,13 @@ endfunction
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
-    call setline(1, 'ROBOTS  Round: '.(s:round+1).'  Score: '.s:score.'  Robots Remaining: '.len(s:robotsPos).'  Safe Transports: '.string(s:safeTransports))
+    let l:safe = float2nr(s:safeTransports)
+    let l:risky = float2nr(10*s:safeTransports) % 10
+    call setline(1, 'ROBOTS  Round: '.(s:round+1).
+                 \  '  Score: '.s:score.
+                 \  '  Robots Remaining: '.len(s:robotsPos).
+                 \  '  Safe Transports: '.repeat(g:robots_safe,l:safe).
+                 \                        repeat(g:robots_risky,l:risky))
     setlocal nomodifiable
 endfunction
 
