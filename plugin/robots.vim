@@ -91,11 +91,9 @@ function! s:UpdateScore(deltaScore)   "{{{1
     setlocal modifiable
     let l:safe = float2nr(s:safeTransports)
     let l:risky = float2nr(10*s:safeTransports) % 10
-    call setline(1, 'ROBOTS  Round: '.(s:round+1).
-                 \  '  Score: '.s:score.
-                 \  '  Robots Remaining: '.len(s:robotsPos).
-                 \  '  Safe Transports: '.repeat(g:robots_safe,l:safe).
-                 \                        repeat(g:robots_risky,l:risky))
+    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %s%s',
+                         \ s:round+1, s:score, len(s:robotsPos),
+                         \ repeat(g:robots_safe,l:safe), repeat(g:robots_risky,l:risky)))
     setlocal nomodifiable
 endfunction
 
