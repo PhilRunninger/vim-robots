@@ -260,7 +260,7 @@ endfunction
 
 function! s:Continue()   "{{{1
     if s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['x'])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×','x'])
         call s:PlayAnother()
     elseif s:PlayerWinsRound()
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
