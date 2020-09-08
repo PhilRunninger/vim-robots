@@ -82,7 +82,7 @@ function! s:DrawGrid()   "{{{1
     execute 'g/^$/d'
     call append(0, ['',''])
     call s:UpdateScore(0)
-    normal! gg
+    normal! 2gg
     setlocal nomodifiable
 endfunction
 
