@@ -7,8 +7,6 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_robot = '■'
     let g:robots_junk_pile = '▲'
     let g:robots_player = '●'
-    let g:robots_safe = '◎'
-    let g:robots_risky = '∙'
 
     tabnew
     let s:cols = (getwininfo(win_getid())[0]['width']+2)/3
@@ -37,7 +35,7 @@ endfunction
 function! s:StartNewGame()   "{{{1
     let s:score = 0
     let s:round = -1
-    let s:safeTransports = 0.0
+    let s:safeTransports = 0
     call s:StartNewRound()
 endfunction
 
@@ -89,11 +87,9 @@ endfunction
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
-    let l:safe = float2nr(s:safeTransports)
-    let l:risky = float2nr(10*s:safeTransports) % 10
     call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %s%s',
                          \ s:round+1, s:score, len(s:robotsPos),
-                         \ repeat(g:robots_safe,l:safe), repeat(g:robots_risky,l:risky)))
+                         \ s:safeTransports/5, ['','⅕','⅖','⅗','⅘'][s:safeTransports%5]))
     setlocal nomodifiable
 endfunction
 
@@ -143,13 +139,13 @@ endfunction
 function! s:Transport()   "{{{1
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
     let s:playerPos = s:RandomPosition()
-    if s:safeTransports >= 1.0
+    if s:safeTransports >= 5
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
             let s:playerPos = s:RandomPosition()
         endwhile
-        let s:safeTransports -= 1.0
+        let s:safeTransports -= 5
     else
-        let s:safeTransports = 0.0
+        let s:safeTransports = 0
     endif
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
     call s:UpdateScore(0)
@@ -213,7 +209,7 @@ function! s:MoveRobots()   "{{{1
             call add(newRobotPos, newPos)
         else
             if s:finishingRound
-                let s:safeTransports += 0.1
+                let s:safeTransports += 1
             endif
             call s:UpdateScore(1)
         endif
@@ -243,7 +239,7 @@ function! s:CreateJunkPiles()   "{{{1
         call add(s:junkPilesPos, s:robotsPos[collision])
         call remove(s:robotsPos,collision)
         if s:finishingRound
-            let s:safeTransports += 0.1
+            let s:safeTransports += 1
         endif
     endfor
     let s:junkPilesPos = uniq(sort(s:junkPilesPos))

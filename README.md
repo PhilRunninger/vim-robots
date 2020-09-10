@@ -35,9 +35,9 @@ To get out of a bind or to earn a bonus, use these keys.
 
 Key | Function
 ---|---
-`t` | Transport to another location when you have nowhere else to go.
+`t` | Transport to another location.
 `w` | Wait for one move, and let the robots advance.
-`F` | Finish the round. Wait until defeat or triumph.
+`F` | Finish the round, waiting until defeat or triumph.
 
 ### Safe Transports
-A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the `F` key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating ten robots earns you one safe transport.
+A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the `F` key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating five robots earns you one safe transport.

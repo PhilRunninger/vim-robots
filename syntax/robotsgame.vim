@@ -1,8 +1,6 @@
 execute 'syntax match RobotsRobot /'.g:robots_robot.'/'
 execute 'syntax match RobotsPlayer /'.g:robots_player.'/'
 execute 'syntax match RobotsJunkPile /'.g:robots_junk_pile.'/'
-execute 'syntax match RobotsSafeTransport /'.g:robots_safe.'\+/'
-execute 'syntax match RobotsRiskyTransport /'.g:robots_risky.'\+/'
 syntax match RobotsTeleportTarget1 /✦/
 syntax match RobotsTeleportTarget2 /★/
 syntax match RobotsTeleportTarget3 /✶/
@@ -11,6 +9,8 @@ syntax match RobotsPlayerDeath2 /x/
 syntax match RobotsPlayerDeath3 /X/
 syntax match RobotsTitle /ROBOTS/
 syntax match RobotsNumbers /\d\+/
+syntax match RobotsSafeTransport /Safe Transports:\s*[1-9]\S*$/
+syntax match RobotsRiskyTransport /Safe Transports:\s*0\S*$/
 syntax match RobotsGameOver /You've been.*/
 
 highlight RobotsRobot cterm=bold ctermfg=165
