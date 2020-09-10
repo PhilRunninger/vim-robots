@@ -210,7 +210,7 @@ function! s:MoveRobots()   "{{{1
             if s:finishingRound
                 let s:safeTransports += 1
             endif
-            call s:UpdateScore(1)
+            call s:UpdateScore(s:finishingRound ? 2 : 1)
         endif
     endfor
 
@@ -242,7 +242,7 @@ function! s:CreateJunkPiles()   "{{{1
         endif
     endfor
     let s:junkPilesPos = uniq(sort(s:junkPilesPos))
-    call s:UpdateScore(len(collisions))
+    call s:UpdateScore(len(collisions) * (s:finishingRound ? 2 : 1))
 endfunction
 
 function! s:GameOver()   "{{{1
