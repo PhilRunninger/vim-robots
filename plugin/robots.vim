@@ -46,7 +46,7 @@ function! s:StartNewRound()   "{{{1
     call s:DrawGrid()
     call s:DrawAll(s:robotsPos, g:robots_robot)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★✦',' '])
 endfunction
 
 function! s:RobotCount()   "{{{1
@@ -136,7 +136,7 @@ function! s:WaitOneTurn()   "{{{1
 endfunction
 
 function! s:Transport()   "{{{1
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦★✶'], g:robots_empty, [' '])
     let s:playerPos = s:RandomPosition()
     if s:safeTransports >= 5
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
@@ -147,9 +147,9 @@ function! s:Transport()   "{{{1
         let s:safeTransports = 0
     endif
     if s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×','x'])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×x'])
     else
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★✦',' '])
     endif
     call s:UpdateScore(0)
     call s:Continue()
@@ -169,13 +169,13 @@ function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
     let cells = map([[-1,-1],[-1,0],[-1,1],[0,2],[1,1],[1,0],[1,-1],[0,-2]], {_,val -> [val[0]+a:cell[0], val[1]+a:cell[1]]})
     for sparkles in [a:beamOn, a:beamOff]
         for sparkle in sparkles
-            let random = map(range(8), {_ -> Random(1000000)})
-            for i in range(8)
+            let random = map(range(8*strchars(sparkle)), {_ -> Random(1000000)})
+            for i in range(8*strchars(sparkle))
                 let max = index(random, max(random))
-                let [r,c] = cells[max]
+                let [r,c] = cells[max % 8]
                 let random[max] = -1
                 if r > 2 && r <= line('$') && c > 0 && c <= strchars(getline(r))
-                    call s:DrawAt([r,c], sparkle)
+                    call s:DrawAt([r,c], strcharpart(sparkle,max/8,1))
                 endif
                 redraw
                 sleep 25m
@@ -259,10 +259,10 @@ endfunction
 
 function! s:Continue()   "{{{1
     if s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×','x'])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×x'])
         call s:PlayAnother()
     elseif s:PlayerWinsRound()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦★✶'], g:robots_empty, [' '])
         call s:StartNewRound()
     endif
 endfunction
@@ -273,7 +273,7 @@ function! s:PlayAnother()   "{{{1
     setlocal nomodifiable
     redraw!
     if nr2char(getchar()) !=? 'n'
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦','★','✶'], g:robots_empty, [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦★✶'], g:robots_empty, [' '])
         call s:StartNewGame()
     else
         bwipeout
