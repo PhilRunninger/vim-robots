@@ -17,10 +17,10 @@ but this reincarnation is based on a hexagonal grid, with movement in only 6 dir
 
 Start a game with the `:Robots` command.
 
-Your player is the circle. Robots are squares, and the junk piles are triangles. *Your colors will vary, depending on your Vim colorscheme and/or terminal color settings.* Your objective is to get all the robots to crash into each or a junk pile, while avoiding capture, so you can advance to the next round.
+Your avatar is the circle. Robots are squares, and the junk piles are triangles. *Your colors will vary, depending on your Vim colorscheme and/or terminal color settings.* Your objective is to get all the robots to walk into a junk pile or another robot, while avoiding capture, so you can advance to the next round.
 
 ### Movement
-Move your player around the screen with these keys.
+Move your avatar around the screen with these keys.
 
 Main Keyboard | Number Keypad | Direction
 ---|---|---
