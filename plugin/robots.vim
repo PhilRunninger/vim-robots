@@ -146,7 +146,11 @@ function! s:Transport()   "{{{1
     else
         let s:safeTransports = 0
     endif
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
+    if s:GameOver()
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×','x'])
+    else
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★','✦',' '])
+    endif
     call s:UpdateScore(0)
     call s:Continue()
 endfunction
