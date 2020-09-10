@@ -50,9 +50,8 @@ function! s:StartNewRound()   "{{{1
 endfunction
 
 function! s:RobotCount()   "{{{1
-    " https://en.wikipedia.org/wiki/Logistic_function
-    let l:count = float2nr(0.5 * (s:rows * s:cols / 2) / (1 + exp(-0.33*(s:round - 13))))
-    return max([2,l:count])
+    let l:cells = (s:rows * s:cols / 2)  " # of cells on the board
+    return float2nr(l:cells * tanh((s:round+1) / pow(l:cells, 0.66)))
 endfunction
 
 function! s:CreateRobotsAndPlayer()   "{{{1
