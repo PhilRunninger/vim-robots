@@ -9,8 +9,8 @@ syntax match RobotsPlayerDeath2 /x/
 syntax match RobotsPlayerDeath3 /X/
 syntax match RobotsTitle /ROBOTS/
 syntax match RobotsNumbers /\d\+/
-syntax match RobotsSafeTransport /Safe Transports:\s*[1-9]\S*$/
-syntax match RobotsRiskyTransport /Safe Transports:\s*0\S*$/
+syntax match RobotsSafeTransport /Safe Transports:\s*[1-9].*$/
+syntax match RobotsRiskyTransport /Safe Transports:\s*0.*$/
 syntax match RobotsGameOver /You've been.*/
 
 highlight RobotsRobot cterm=bold ctermfg=165

@@ -86,9 +86,9 @@ endfunction
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
-    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %s%s',
+    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %d %s',
                          \ s:round+1, s:score, len(s:robotsPos),
-                         \ s:safeTransports/5, ['','⅕','⅖','⅗','⅘'][s:safeTransports%5]))
+                         \ s:safeTransports/5, s:safeTransports%5 ? s:safeTransports%5.'/5' : ''))
     setlocal nomodifiable
 endfunction
 
