@@ -24,20 +24,20 @@ Move your avatar around the screen with these keys.
 
 Main Keyboard | Number Keypad | Direction
 ---|---|---
-`y` | `7` | Up left
-`k` | `8` | Up
-`u` | `9` | Up right
-`b` | `1` | Down left
-`j` | `2` | Down
-`n` | `3` | Down right
+<kbd>y</kbd> | <kbd>7</kbd> | Up left
+<kbd>k</kbd> | <kbd>8</kbd> | Up
+<kbd>u</kbd> | <kbd>9</kbd> | Up right
+<kbd>b</kbd> | <kbd>1</kbd> | Down left
+<kbd>j</kbd> | <kbd>2</kbd> | Down
+<kbd>n</kbd> | <kbd>3</kbd> | Down right
 
 To get out of a bind or to earn a bonus, use these keys.
 
 Key | Function
 ---|---
-`t` | Transport to another location.
-`w` | Wait for one move, and let the robots advance.
-`F` | Finish the round, waiting until defeat or triumph.
+<kbd>t</kbd> | Transport to another location.
+<kbd>w</kbd> | Wait for one move, and let the robots advance.
+<kbd>F</kbd> | Finish the round, waiting until defeat or triumph.
 
 ### Safe Transports
-A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the `F` key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating five robots earns you one safe transport.
+A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the <kbd>F</kbd> key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating five robots earns you one safe transport.
