@@ -1,7 +1,7 @@
 # Vim Robots
 
 ## Introduction
-This is a Vim plugin implementation of the classic game. Check out the [Wikipedia article](https://en.wikipedia.org/wiki/Chase_(video_game)) about the game to learn its history.
+This is a Vim plugin implementation of the classic game Robots. Check out this [Wikipedia article](https://en.wikipedia.org/wiki/Chase_(video_game)) to learn its history.
 
 There is one key difference between the classic game and this modern Vim update. The original version is based on a Cartesian grid, with movement in the usual 8 directions,...
 
@@ -17,7 +17,7 @@ but this reincarnation is based on a hexagonal grid, with movement in only 6 dir
 
 Start a game with the `:Robots` command.
 
-Your avatar is the circle. Robots are squares, and the junk piles are triangles. *Your colors will vary, depending on your Vim colorscheme and/or terminal color settings.* Your objective is to get all the robots to walk into a junk pile or another robot, while avoiding capture, so you can advance to the next round.
+Your avatar is the circle. Robots are squares, and the junk piles are triangles. *Your colors will vary, depending on your Vim colorscheme and/or terminal color settings.* The robots are programmed to pursue you at all costs. They will choose the shortest path diagonally or vertically. Horizontal movement requires them to randomly choose a diagonally up or down direction. Fortunately, they are oblivious to each other, and will collide, leaving a flaming pile of junk. Your objective is to lure all the robots to walk into a junk pile or another robot, while avoiding capture, so you can advance to the next round.
 
 ### Movement
 Move your avatar around the screen with these keys.
@@ -40,4 +40,4 @@ Key | Function
 <kbd>F</kbd> | Finish the round, waiting until defeat or triumph.
 
 ### Safe Transports
-A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the <kbd>F</kbd> key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating five robots earns you one safe transport.
+A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot, and die immediately. You can earn safe transports though, by using the <kbd>F</kbd> key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating five robots in this manner earns you one safe transport.
