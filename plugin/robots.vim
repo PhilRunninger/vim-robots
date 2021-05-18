@@ -3,10 +3,10 @@
 command! Robots :call <SID>InitAndStartRobots()   "{{{1
 
 function! s:InitAndStartRobots()   "{{{1
-    let g:robots_empty = '·'
-    let g:robots_robot = '■'
-    let g:robots_junk_pile = '▲'
-    let g:robots_player = '●'
+    let g:robots_empty     = get(g:, 'robots_empty', '·')
+    let g:robots_robot     = get(g:, 'robots_robot', '■')
+    let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
+    let g:robots_player    = get(g:, 'robots_player', '●')
 
     tabnew
     let s:cols = (getwininfo(win_getid())[0]['width']+2)/3
@@ -74,7 +74,7 @@ function! s:DrawGrid()   "{{{1
     setlocal modifiable
     normal! ggdG
     for r in range(1,s:rows,1)
-        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat('·     ', s:cols), 0, getwininfo(win_getid())[0]['width']))
+        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat(g:robots_empty . '     ', s:cols), 0, getwininfo(win_getid())[0]['width']))
     endfor
     execute 'g/^$/d'
     call append(0, ['',''])
