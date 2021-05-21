@@ -9,8 +9,10 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_player    = get(g:, 'robots_player', '●')
 
     tabnew
-    let s:cols = (getwininfo(win_getid())[0]['width']+2)/3
-    let s:rows = 2*(getwininfo(win_getid())[0]['height']/2) - 2
+    let s:width = getwininfo(win_getid())[0]['width']
+    let s:height = getwininfo(win_getid())[0]['height']
+    let s:cols = (s:width+2)/3
+    let s:rows = 2*(s:height/2) - 2
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
     setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn
@@ -136,6 +138,7 @@ function! s:WaitOneTurn()   "{{{1
 endfunction
 
 function! s:Transport()   "{{{1
+    let l:startPt = s:ToScreenPosition(s:playerPos)
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦★✶'], g:robots_empty, [' '])
     let s:playerPos = s:RandomPosition()
     if s:safeTransports >= 5
@@ -146,6 +149,9 @@ function! s:Transport()   "{{{1
     else
         let s:safeTransports = 0
     endif
+    let l:endPt = s:ToScreenPosition(s:playerPos)
+    call s:Bezier(l:startPt, l:endPt)
+
     if s:GameOver()
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×x'])
     else
@@ -153,6 +159,36 @@ function! s:Transport()   "{{{1
     endif
     call s:UpdateScore(0)
     call s:Continue()
+endfunction
+
+function! s:Bezier(startPt, endPt)   "{{{1
+    let l:count = 50
+    let l:ctl = [a:startPt, [1+Random(s:height), 1+Random(s:width)], [1+Random(s:height), 1+Random(s:width)], a:endPt]
+    let l:bezier = []
+    for t in range(0,l:count)
+        let t = 1.0*t/l:count
+        call add(l:bezier,
+                    \ [float2nr(round(pow(1-t,3.0)*l:ctl[0][0] + 3.0*pow(1-t,2.0)*t*l:ctl[1][0] + 3.0*(1-t)*pow(t,2.0)*l:ctl[2][0] + pow(t,3.0)*l:ctl[3][0])),
+                    \  float2nr(round(pow(1-t,3.0)*l:ctl[0][1] + 3.0*pow(1-t,2.0)*t*l:ctl[1][1] + 3.0*(1-t)*pow(t,2.0)*l:ctl[2][1] + pow(t,3.0)*l:ctl[3][1]))])
+        if t>0 && l:bezier[-1] == l:bezier[-2]  " Remove consecutive duplicates.
+            call remove(l:bezier,-1)
+        endif
+    endfor
+
+    let old_chars = map(copy(l:bezier), {_,v -> strcharpart(getline(v[0]), v[1]-1, 1)})
+    for p in l:bezier
+        call s:DrawAt(p, strcharpart('✦★✶',Random(3),1))
+        redraw
+        sleep 1m
+    endfor
+    redraw!
+
+    for p in l:bezier
+        call s:DrawAt(p, old_chars[index(l:bezier,p)])
+        redraw
+        sleep 1m
+    endfor
+    redraw
 endfunction
 
 function! s:FinishRound()   "{{{1
