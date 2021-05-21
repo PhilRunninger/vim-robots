@@ -178,18 +178,20 @@ function! s:Bezier(startPt, endPt)   "{{{1
     endfor
 
     let old_chars = map(copy(l:bezier), {_,v -> strcharpart(getline(v[0]), v[1]-1, 1)})
-    for p in l:bezier
-        call s:DrawAt(p, strcharpart('✦★✶',Random(3),1))
+    let i = 0
+    let j = -len(l:bezier)/2
+    while i < len(l:bezier) || j < len(l:bezier)
+        if i >= 0 && i < len(l:bezier)
+            call s:DrawAt(l:bezier[i], strcharpart('✦★✶',Random(3),1))
+        endif
+        if j >= 0 && j < len(l:bezier)
+            call s:DrawAt(l:bezier[j], old_chars[j])
+        endif
         redraw
         sleep 1m
-    endfor
-    redraw!
-
-    for p in l:bezier
-        call s:DrawAt(p, old_chars[index(l:bezier,p)])
-        redraw
-        sleep 1m
-    endfor
+        let i += 1
+        let j += 1
+    endwhile
     redraw
 endfunction
 
