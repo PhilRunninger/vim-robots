@@ -44,10 +44,12 @@ endfunction
 function! s:StartNewRound()   "{{{1
     let s:round += 1
     let s:finishingRound = 0
+    let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
     call s:DrawAll(s:robotsPos, g:robots_robot)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
+    call s:Bezier(l:startPt, s:ToScreenPosition(s:playerPos))
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★✦',' '])
 endfunction
 
