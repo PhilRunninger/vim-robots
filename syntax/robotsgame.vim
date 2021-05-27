@@ -17,7 +17,7 @@ syntax match RobotsGameOver /You've been.*/
 highlight RobotsRobot cterm=bold ctermfg=165 guifg=#df00ff
 highlight RobotsPlayer cterm=bold ctermfg=40 guifg=#00df00
 highlight RobotsJunkPile cterm=bold ctermfg=208 guifg=#ff8700
-highlight RobotsEmpty cterm=bold ctermfg=237 guifg=#3a3a3a
+highlight RobotsEmpty cterm=bold ctermfg=242 guifg=#666666
 highlight RobotsTeleportTarget1 cterm=bold ctermfg=220 guifg=#ffdf00
 highlight RobotsTeleportTarget2 cterm=bold ctermfg=228 guifg=#ffff87
 highlight RobotsTeleportTarget3 cterm=bold ctermfg=231 guifg=#ffffff
