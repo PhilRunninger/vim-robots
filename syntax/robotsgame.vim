@@ -17,15 +17,25 @@ syntax match RobotsGameOver /You've been.*/
 highlight RobotsRobot cterm=bold ctermfg=165 guifg=#df00ff
 highlight RobotsPlayer cterm=bold ctermfg=40 guifg=#00df00
 highlight RobotsJunkPile cterm=bold ctermfg=208 guifg=#ff8700
-highlight RobotsEmpty cterm=bold ctermfg=242 guifg=#666666
-highlight RobotsTeleportTarget1 cterm=bold ctermfg=220 guifg=#ffdf00
-highlight RobotsTeleportTarget2 cterm=bold ctermfg=228 guifg=#ffff87
-highlight RobotsTeleportTarget3 cterm=bold ctermfg=231 guifg=#ffffff
 highlight RobotsPlayerDeath1 cterm=bold ctermfg=124 guifg=#af0000
 highlight RobotsPlayerDeath2 cterm=bold ctermfg=160 guifg=#df0000
 highlight RobotsPlayerDeath3 cterm=bold ctermfg=196 guifg=#ff0000
-highlight RobotsSafeTransport cterm=bold ctermfg=40 guifg=#00df00
-highlight RobotsRiskyTransport cterm=bold ctermfg=196 guifg=#ff0000
-highlight RobotsTitle cterm=bold ctermfg=214 guifg=#ffaf00
-highlight RobotsNumbers cterm=bold ctermfg=220 guifg=#ffdf00
 highlight RobotsGameOver cterm=bold ctermfg=196 guifg=#ff0000
+
+if &background == 'dark'
+    highlight RobotsEmpty cterm=bold ctermfg=242 guifg=#666666
+    highlight RobotsTeleportTarget1 cterm=bold ctermfg=220 guifg=#ffdf00
+    highlight RobotsTeleportTarget2 cterm=bold ctermfg=228 guifg=#ffff87
+    highlight RobotsTeleportTarget3 cterm=bold ctermfg=231 guifg=#ffffff
+    highlight RobotsSafeTransport cterm=bold ctermfg=40 guifg=#00df00
+    highlight RobotsTitle cterm=bold ctermfg=214 guifg=#ffaf00
+    highlight RobotsNumbers cterm=bold ctermfg=220 guifg=#ffdf00
+else
+    highlight RobotsEmpty cterm=bold ctermfg=250 guifg=#bcbcbc
+    highlight RobotsTeleportTarget1 cterm=bold ctermfg=26 guifg=#005fdf
+    highlight RobotsTeleportTarget2 cterm=bold ctermfg=32 guifg=#0087df
+    highlight RobotsTeleportTarget3 cterm=bold ctermfg=38 guifg=#00afdf
+    highlight RobotsSafeTransport cterm=bold ctermfg=34 guifg=#00af00
+    highlight RobotsTitle cterm=bold ctermfg=172 guifg=#df8700
+    highlight RobotsNumbers cterm=bold ctermfg=172 guifg=#df8700
+endif

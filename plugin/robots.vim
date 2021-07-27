@@ -6,7 +6,7 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_empty     = get(g:, 'robots_empty', '·')
     let g:robots_robot     = get(g:, 'robots_robot', '■')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
-    let g:robots_player    = get(g:, 'robots_player', '●')
+    let g:robots_player    = get(g:, 'robots_player', '⬤')
 
     tabnew
     let s:width = getwininfo(win_getid())[0]['width']
