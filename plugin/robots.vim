@@ -36,7 +36,7 @@ endfunction
 
 function! s:StartNewGame()   "{{{1
     let s:score = 0
-    let s:round = -1
+    let s:round = 0
     let s:safeTransports = 0
     call s:StartNewRound()
 endfunction
@@ -55,7 +55,7 @@ endfunction
 
 function! s:RobotCount()   "{{{1
     let l:cells = (s:rows * s:cols / 2)  " # of cells on the board
-    return float2nr(l:cells * tanh((s:round+1) / pow(l:cells, 0.66)))
+    return float2nr(l:cells * tanh((s:round) / pow(l:cells, 0.66)))
 endfunction
 
 function! s:CreateRobotsAndPlayer()   "{{{1
@@ -91,7 +91,7 @@ function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += a:deltaScore
     setlocal modifiable
     call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %d %s',
-                         \ s:round+1, s:score, len(s:robotsPos),
+                         \ s:round, s:score, len(s:robotsPos),
                          \ s:safeTransports/5, s:safeTransports%5 ? s:safeTransports%5.'/5' : ''))
     setlocal nomodifiable
 endfunction
