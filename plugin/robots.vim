@@ -88,7 +88,7 @@ function! s:DrawGrid()   "{{{1
 endfunction
 
 function! s:UpdateScore(deltaScore)   "{{{1
-    let s:score += a:deltaScore
+    let s:score += (a:deltaScore * (s:finishingRound ? 2 : 1))
     setlocal modifiable
     call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %d %s',
                          \ s:round, s:score, len(s:robotsPos),
@@ -254,7 +254,7 @@ function! s:MoveRobots()   "{{{1
             if s:finishingRound
                 let s:safeTransports += 1
             endif
-            call s:UpdateScore(s:finishingRound ? 2 : 1)
+            call s:UpdateScore(1)
         endif
     endfor
 
@@ -286,7 +286,7 @@ function! s:CreateJunkPiles()   "{{{1
         endif
     endfor
     let s:junkPilesPos = uniq(sort(s:junkPilesPos))
-    call s:UpdateScore(len(collisions) * (s:finishingRound ? 2 : 1))
+    call s:UpdateScore(len(collisions))
 endfunction
 
 function! s:GameOver()   "{{{1
