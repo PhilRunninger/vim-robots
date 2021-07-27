@@ -43,7 +43,7 @@ endfunction
 
 function! s:StartNewRound()   "{{{1
     let s:round += 1
-    let s:finishingRound = 0
+    let s:finishingRound = v:false
     let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
@@ -196,7 +196,7 @@ function! s:Bezier(startPt, endPt)   "{{{1
 endfunction
 
 function! s:FinishRound()   "{{{1
-    let s:finishingRound = 1
+    let s:finishingRound = v:true
     while !s:PlayerWinsRound() && !s:GameOver()
         call s:MoveRobots()
         redraw
