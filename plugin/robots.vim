@@ -47,10 +47,10 @@ function! s:StartNewRound()   "{{{1
     let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
-    call s:DrawAll(s:robotsPos, g:robots_robot)
-    call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
     call s:Bezier(l:startPt, s:ToScreenPosition(s:playerPos))
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★✦',' '])
+    call s:DrawAll(s:robotsPos, g:robots_robot, 10)
+    call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 endfunction
 
 function! s:RobotCount()   "{{{1
@@ -106,9 +106,13 @@ function! s:DrawAt(position, character)   "{{{1
     setlocal nomodifiable
 endfunction
 
-function! s:DrawAll(positions, character)   "{{{1
+function! s:DrawAll(positions, character, delay=0)   "{{{1
     for position in a:positions
         call s:DrawAt(s:ToScreenPosition(position), a:character)
+        if a:delay > 0
+            redraw
+            execute 'sleep '.a:delay.'m'
+        endif
     endfor
 endfunction
 
@@ -302,6 +306,7 @@ function! s:Continue()   "{{{1
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], 'X', ['×x'])
         call s:PlayAnother()
     elseif s:PlayerWinsRound()
+        call s:DrawAll(s:junkPilesPos, g:robots_empty, 25)
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦★✶'], g:robots_empty, [' '])
         call s:StartNewRound()
     endif
