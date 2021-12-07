@@ -9,6 +9,7 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_player    = get(g:, 'robots_player', '⬤')
 
     tabnew
+    let s:transportRate = 5
     let s:width = getwininfo(win_getid())[0]['width']
     let s:height = getwininfo(win_getid())[0]['height']
     let s:cols = (s:width+2)/3
@@ -90,9 +91,9 @@ endfunction
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += (a:deltaScore * (s:finishingRound ? 2 : 1))
     setlocal modifiable
-    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %d %s',
-                         \ s:round, s:score, len(s:robotsPos),
-                         \ s:safeTransports/5, s:safeTransports%5 ? s:safeTransports%5.'/5' : ''))
+    let l:safeTransports = trim(trim(printf('%.3f', 1.0*s:safeTransports/s:transportRate), '0', 2), '.', 2)
+    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %s',
+                         \ s:round, s:score, len(s:robotsPos), l:safeTransports))
     setlocal nomodifiable
 endfunction
 
@@ -147,11 +148,11 @@ function! s:Transport()   "{{{1
     let l:startPt = s:ToScreenPosition(s:playerPos)
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✦★✶'], g:robots_empty, [' '])
     let s:playerPos = s:RandomPosition()
-    if s:safeTransports >= 5
+    if s:safeTransports >= s:transportRate
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
             let s:playerPos = s:RandomPosition()
         endwhile
-        let s:safeTransports -= 5
+        let s:safeTransports -= s:transportRate
     else
         let s:safeTransports = 0
     endif
