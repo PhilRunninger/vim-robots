@@ -271,27 +271,18 @@ function! s:MoveRobots()   "{{{1
 endfunction
 
 function! s:CreateJunkPiles()   "{{{1
-    let collisions = []
-    for a in range(0, len(s:robotsPos)-1)
-        if a < len(s:robotsPos)
-            for b in range(a+1, len(s:robotsPos)-1)
-                if b < len(s:robotsPos) && s:robotsPos[a] == s:robotsPos[b]
-                    call add(collisions, a)
-                    call add(collisions, b)
-                endif
-            endfor
-        endif
-    endfor
-    let collisions = reverse(uniq(sort(collisions, 'n')))
-    for collision in collisions
-        call add(s:junkPilesPos, s:robotsPos[collision])
-        call remove(s:robotsPos,collision)
-        if s:finishingRound
-            let s:safeTransports += 1
+    let kills = 0
+    let collisions = map(copy(s:robotsPos), {_,v -> count(s:robotsPos, v)})
+    for i in range(len(collisions)-1, 0, -1)
+        if collisions[i] > 1
+            call add(s:junkPilesPos, s:robotsPos[i])
+            call remove(s:robotsPos, i)
+            let kills += 1
         endif
     endfor
     let s:junkPilesPos = uniq(sort(s:junkPilesPos))
-    call s:UpdateScore(len(collisions))
+    let s:safeTransports += (s:finishingRound ? kills : 0)
+    call s:UpdateScore(kills)
 endfunction
 
 function! s:GameOver()   "{{{1
