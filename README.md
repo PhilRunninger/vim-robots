@@ -43,7 +43,7 @@ Key | Function
 A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot or junk pile, and die immediately. You can earn safe transports though, by using the <kbd>F</kbd> key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating five robots in this manner earns you one safe transport.
 
 ## Customization
-The characters used to represent various items can be changed to your liking. Just set one more of these variables in your `.vimrc`:
+The characters used to represent various items can be changed to your liking. Just set one or more of these variables in your `.vimrc`:
 
 Variable | Default | Example (for the retro look.)
 ---|:-:|---
