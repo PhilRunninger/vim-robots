@@ -6,6 +6,6 @@ function! Random(...)
     endif
 
     let num = map(range(3), {_ -> fmod(reltimefloat(reltime()),1) * 1.0e6})
-    let num = fmod(num[0]*num[1]*num[2], 987654321098707) / 987654321098707.0
+    let num = fmod(num[0]*num[1]*num[2], 2038074743) / 2038074743.0
     return a:0 ? float2nr(num*a:1) : num
 endfunction
