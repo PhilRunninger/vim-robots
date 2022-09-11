@@ -9,11 +9,13 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_player    = get(g:, 'robots_player', '⬤')
 
     tabnew
+    let s:playerShortcutRound = 2
+    let s:robotsShortcutRound = 3
     let s:transportRate = 5
     let s:width = getwininfo(win_getid())[0]['width']
     let s:height = getwininfo(win_getid())[0]['height']
-    let s:cols = (s:width+2)/3
-    let s:rows = 2*(s:height/2) - 2
+    let s:cols = 2*float2nr((s:width+2)/6)
+    let s:rows = 2*float2nr(s:height/2) - 2
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
     setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn
@@ -46,12 +48,21 @@ function! s:StartNewRound()   "{{{1
     let s:round += 1
     let s:finishingRound = v:false
     let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
+
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
     call s:Bezier(l:startPt, s:ToScreenPosition(s:playerPos))
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✶'], g:robots_player, ['★✦',' '])
     call s:DrawAll(s:robotsPos, g:robots_robot, 10)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
+
+    if s:round == s:playerShortcutRound
+        let msg = 'Congrats! You just found shortcuts from each edge to the opposite side.'
+        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(msg))/2, msg))
+    elseif s:round == s:robotsShortcutRound
+        let msg = 'Oh no! The robots found the shortcuts. Watch out!'
+        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(msg))/2, msg))
+    endif
 endfunction
 
 function! s:RobotCount()   "{{{1
@@ -128,11 +139,13 @@ function! s:ToScreenPosition(position)   "{{{1
     return [r+3, 3*c+1]
 endfunction
 
-function! s:NewPosition(position, deltaRow, deltaCol)   "{{{1
+function! s:NewPosition(position, deltaRow, deltaCol, wrapAround)   "{{{1
     let [r,c] = a:position
     let r += a:deltaRow
     let c += a:deltaCol
-    if r < 0 || r >= s:rows || c < 0 || c >= s:cols
+    if a:wrapAround
+        return [(r + s:rows) % s:rows, (c + s:cols) % s:cols]
+    elseif r < 0 || r >= s:rows || c < 0 || c >= s:cols
         return a:position
     else
         return [r,c]
@@ -233,7 +246,7 @@ function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
 endfunction
 
 function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
-    let newPos = s:NewPosition(s:playerPos, a:deltaRow, a:deltaCol)
+    let newPos = s:NewPosition(s:playerPos, a:deltaRow, a:deltaCol, s:round >= s:playerShortcutRound)
     if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
@@ -249,10 +262,17 @@ function! s:MoveRobots()   "{{{1
     for robot in s:robotsPos
         let deltaRow = s:playerPos[0] - robot[0]
         let deltaCol = s:playerPos[1] - robot[1]
-        let deltaRow = (deltaRow == 0 ? (robot[0]==0 ? 1 : (robot[0]==s:rows-1 ? -1 : 2*Random(2)-1)) : deltaRow/abs(deltaRow))
-        let deltaRow = deltaRow * (deltaCol == 0 ? 2 : 1)
-        let deltaCol = (deltaCol == 0 ? 0 : deltaCol/abs(deltaCol))
-        let newPos = s:NewPosition(robot, deltaRow, deltaCol)
+        if s:round >= s:robotsShortcutRound
+            let deltaRow = deltaRow == 0 ? 2*Random(2)-1 : (abs(deltaRow) <= s:rows/2 ? deltaRow/abs(deltaRow) : -deltaRow/abs(deltaRow))
+            let deltaRow = deltaRow * (deltaCol == 0 ? 2 : 1)
+            let deltaCol = deltaCol == 0 ? 0 : (abs(deltaCol) <= s:cols/2 ? deltaCol/abs(deltaCol) : -deltaCol/abs(deltaCol))
+        else
+            let deltaRow = (deltaRow == 0 ? (robot[0]==0 ? 1 : (robot[0]==s:rows-1 ? -1 : 2*Random(2)-1)) : deltaRow/abs(deltaRow))
+            let deltaRow = deltaRow * (deltaCol == 0 ? 2 : 1)
+            let deltaCol = (deltaCol == 0 ? 0 : deltaCol/abs(deltaCol))
+        endif
+
+        let newPos = s:NewPosition(robot, deltaRow, deltaCol, s:round >= s:robotsShortcutRound)
         if count(s:junkPilesPos, newPos) == 0
             call add(newRobotPos, newPos)
         else
