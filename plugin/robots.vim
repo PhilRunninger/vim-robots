@@ -108,13 +108,14 @@ function! s:UpdateScore(deltaScore)   "{{{1
     setlocal nomodifiable
 endfunction
 
-function! s:DrawAt(position, character)   "{{{1
+function! s:DrawAt(position, text)   "{{{1
     let [r,c] = a:position
-    let line = getline(r)
-    let lft = strcharpart(line, 0, c-1)
-    let rgt = strcharpart(line, c)
+    let ln = getline(r)
+    let leftStr = strcharpart(ln, 0, c-1)
+    let rightStr = strcharpart(ln, c - 1 + strchars(a:text))
+    let ln = leftStr . a:text . rightStr
     setlocal modifiable
-    call setline(r, lft.a:character.rgt)
+    call setline(r, ln)
     setlocal nomodifiable
 endfunction
 
