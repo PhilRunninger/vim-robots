@@ -18,7 +18,7 @@ function! s:InitAndStartRobots()   "{{{1
     let s:rows = 2*float2nr(s:height/2) - 2
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
-    setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn
+    setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn nohlsearch
     execute 'setlocal statusline='.g:robots_player.':you\ '.g:robots_robot.':robot\ '.g:robots_junk_pile.':junk\ pile\ \ yujkbn:Move\ \ w:Wait\ \ t:Transport\ \ F:Finish'
 
     for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
@@ -90,9 +90,15 @@ function! s:DrawGrid()   "{{{1
     setlocal modifiable
     normal! ggdG
     for r in range(1,s:rows,1)
-        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat(g:robots_empty . '     ', s:cols), 0, getwininfo(win_getid())[0]['width']))
+        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat(g:robots_empty . '     ', s:cols/2), 0, s:width))
     endfor
     execute 'g/^$/d'
+    if s:round >= s:playerShortcutRound
+        execute '1s/'.g:robots_empty.'/○/g'
+        execute '$s/'.g:robots_empty.'/○/g'
+        execute '1,$s/^'.g:robots_empty.'/○/'
+        execute '1,$s/^.\{'.3*(s:cols-1).'}\zs'.g:robots_empty.'/○/'
+    endif
     call append(0, ['',''])
     call s:UpdateScore(0)
     normal! 2gg
