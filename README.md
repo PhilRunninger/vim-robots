@@ -17,7 +17,7 @@ but this reincarnation is based on a hexagonal grid, with movement in only 6 dir
 
 Start a game with the `:Robots` command.
 
-Your avatar is the circle. Robots are squares, and the junk piles are triangles. *Your colors will vary, depending on your Vim colorscheme and/or terminal color settings.* The robots are programmed to pursue you at all costs. They will choose the shortest path diagonally or vertically. Horizontal movement requires them to randomly choose a diagonally up or down direction. Fortunately, they are oblivious to each other, and will collide, leaving a flaming pile of junk. Your objective is to lure all the robots to walk into a junk pile or another robot, while avoiding capture, so you can advance to the next round.
+Your avatar is the circle. Robots are squares, and the junk piles are triangles. *Your colors may vary, depending on your Vim colorscheme and/or terminal color settings.* The robots are programmed to pursue you at all costs. They will choose the shortest path diagonally or vertically. Horizontal movement requires them to randomly choose a diagonally up or down direction. Fortunately, they are oblivious to each other, and will collide, leaving a flaming pile of junk. Your objective is to lure all the robots to walk into a junk heap or another robot, while avoiding capture, so you can advance to the next round. In later rounds, you can take advantage of portals to travel instantl from one edge of the field to the opposite side. Eventually, the robots will catch on, and follow you through those portals too, so be careful.
 
 ### Movement
 Move your avatar around the screen with these keys.
@@ -50,4 +50,5 @@ Variable | Default | Example (for the retro look.)
 `g:robots_empty`     | · | `let g:robots_empty = ' '`
 `g:robots_robot`     | ■ | `let g:robots_robot = '+'`
 `g:robots_junk_pile` | ▲ | `let g:robots_junk_pile = '*'`
-`g:robots_player`    | ⬤ | `let g:robots_player = '@'`
+`g:robots_player`    | ● | `let g:robots_player = '@'`
+`g:robots_portal`    | ○ | No equivalent
