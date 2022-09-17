@@ -95,16 +95,32 @@ function! s:DrawGrid()   "{{{1
         call append(0, strcharpart((r % 2 ? '' : '   ') . repeat(g:robots_empty . '     ', s:cols/2), 0, s:width))
     endfor
     execute 'g/^$/d'
-    if s:round >= s:playerShortcutRound
+    if s:VerticalPortalsAreOpen()
         execute 'silent 1s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
         execute 'silent $s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
     endif
+    if s:HorizontalPortalsAreOpen()
         execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'
         execute 'silent 1,$s/^.\{'.3*(s:cols-1).'}\zs'.g:robots_empty.'/'.g:robots_portal.'/e'
+    endif
     call append(0, ['',''])
     call s:UpdateScore(0)
     normal! 2gg
     setlocal nomodifiable
+endfunction
+
+function! s:PortalsAreOpen(open, forWhom)   "{{{1
+    return a:open && ( a:forWhom == 'any' ||
+                   \  (a:forWhom == 'player' && s:round >= s:playerShortcutRound) ||
+                   \  (a:forWhom == 'robot' && s:round >= s:robotsShortcutRound))
+endfunction
+
+function! s:VerticalPortalsAreOpen(forWhom = 'any')
+    return s:PortalsAreOpen(((s:round-s:playerShortcutRound) / 2) % 2 == 1, a:forWhom)
+endfunction
+
+function! s:HorizontalPortalsAreOpen(forWhom = 'any')
+    return s:PortalsAreOpen((s:round-s:playerShortcutRound) % 2 == 1, a:forWhom)
 endfunction
 
 function! s:UpdateScore(deltaScore)   "{{{1
