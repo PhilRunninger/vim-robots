@@ -300,19 +300,29 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     call s:Continue()
 endfunction
 
+function! s:Sign(num)   "{{{1
+    return a:num == 0 ? 0 : (a:num < 0 ? -1 : 1)
+endfunction
+
 function! s:MoveRobots()   "{{{1
     let newRobotPos = []
     for robot in s:robotsPos
-        let deltaRow = s:playerPos[0] - robot[0]
+        let deltaRow = s:playerPos[0] == robot[0] ? 2*Random(2)-1 : s:playerPos[0] - robot[0]
         let deltaCol = s:playerPos[1] - robot[1]
-        if s:round >= s:robotsShortcutRound
-            let deltaRow = deltaRow == 0 ? 2*Random(2)-1 : (abs(deltaRow) <= s:rows/2 ? deltaRow/abs(deltaRow) : -deltaRow/abs(deltaRow))
-            let deltaRow = deltaRow * (deltaCol == 0 ? 2 : 1)
-            let deltaCol = deltaCol == 0 ? 0 : (abs(deltaCol) <= s:cols/2 ? deltaCol/abs(deltaCol) : -deltaCol/abs(deltaCol))
+
+        if s:VerticalPortalsAreOpen('robot')
+            let deltaRow = abs(deltaRow) > s:rows/2 ? -s:Sign(deltaRow) : s:Sign(deltaRow)
+        elseif robot[0]>0 && robot[0]<s:rows
+            let deltaRow = s:Sign(deltaRow)
         else
-            let deltaRow = (deltaRow == 0 ? (robot[0]==0 ? 1 : (robot[0]==s:rows-1 ? -1 : 2*Random(2)-1)) : deltaRow/abs(deltaRow))
-            let deltaRow = deltaRow * (deltaCol == 0 ? 2 : 1)
-            let deltaCol = (deltaCol == 0 ? 0 : deltaCol/abs(deltaCol))
+            let deltaRow = robot[0]==0 ? 1 : -1
+        endif
+        let deltaRow *= (deltaCol == 0 ? 2 : 1)
+
+        if s:HorizontalPortalsAreOpen('robot')
+            let deltaCol = abs(deltaCol) > s:cols/2 ? -s:Sign(deltaCol) : s:Sign(deltaCol)
+        else
+            let deltaCol = s:Sign(deltaCol)
         endif
 
         let newPos = s:NewPosition(robot, deltaRow, deltaCol, 'robot')
