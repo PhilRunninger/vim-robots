@@ -176,17 +176,23 @@ function! s:ToScreenPosition(position)   "{{{1
     return [r+3, 3*c+1]
 endfunction
 
-function! s:NewPosition(position, deltaRow, deltaCol, wrapAround)   "{{{1
+function! s:NewPosition(position, deltaRow, deltaCol, forWhom)   "{{{1
     let [r,c] = a:position
     let r += a:deltaRow
     let c += a:deltaCol
-    if a:wrapAround
-        return [(r + s:rows) % s:rows, (c + s:cols) % s:cols]
-    elseif r < 0 || r >= s:rows || c < 0 || c >= s:cols
+    if s:VerticalPortalsAreOpen(a:forWhom)
+        let r = (r + s:rows) % s:rows
+    elseif r < 0 || r >= s:rows
         return a:position
-    else
-        return [r,c]
     endif
+
+    if s:HorizontalPortalsAreOpen(a:forWhom)
+        let c = (c + s:cols) % s:cols
+    elseif c < 0 || c >= s:cols
+        return a:position
+    endif
+
+    return [r,c]
 endfunction
 
 function! s:WaitOneTurn()   "{{{1
@@ -283,7 +289,7 @@ function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
 endfunction
 
 function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
-    let newPos = s:NewPosition(s:playerPos, a:deltaRow, a:deltaCol, s:round >= s:playerShortcutRound)
+    let newPos = s:NewPosition(s:playerPos, a:deltaRow, a:deltaCol, 'player')
     if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
@@ -309,7 +315,7 @@ function! s:MoveRobots()   "{{{1
             let deltaCol = (deltaCol == 0 ? 0 : deltaCol/abs(deltaCol))
         endif
 
-        let newPos = s:NewPosition(robot, deltaRow, deltaCol, s:round >= s:robotsShortcutRound)
+        let newPos = s:NewPosition(robot, deltaRow, deltaCol, 'robot')
         if count(s:junkPilesPos, newPos) == 0
             call add(newRobotPos, newPos)
         else
