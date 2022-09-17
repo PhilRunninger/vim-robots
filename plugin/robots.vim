@@ -7,6 +7,9 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_robot     = get(g:, 'robots_robot', '■')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player', '●')
+    let g:robots_portal_intro = 'Portals along the edge will transport you to the opposite side.'
+    let g:robots_portal_warning =  'Oh no! The robots found the shortcuts. Watch out!'
+    let g:robots_game_over =  'You were terminated! Another game?'
 
     tabnew
     let s:playerShortcutRound = 2
@@ -57,11 +60,9 @@ function! s:StartNewRound()   "{{{1
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 
     if s:round == s:playerShortcutRound
-        let msg = 'Congrats! You just found shortcuts from each edge to the opposite side.'
-        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(msg))/2, msg))
+        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_intro))/2, g:robots_portal_intro))
     elseif s:round == s:robotsShortcutRound
-        let msg = 'Oh no! The robots found the shortcuts. Watch out!'
-        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(msg))/2, msg))
+        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_warning))/2, g:robots_portal_warning))
     endif
 endfunction
 
@@ -333,7 +334,8 @@ endfunction
 
 function! s:PlayAnother()   "{{{1
     setlocal modifiable
-    call setline(2, "You've been terminated! Another game? [Y]es/(N)o:")
+    call setline(2,'')
+    call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_game_over))/2, g:robots_game_over))
     setlocal nomodifiable
     redraw!
     if nr2char(getchar()) ==? 'y'

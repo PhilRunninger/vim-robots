@@ -12,7 +12,9 @@ syntax match RobotsTitle /ROBOTS/
 syntax match RobotsNumbers /\d\+/
 syntax match RobotsSafeTransport /Safe Transports:\s*[1-9].*$/
 syntax match RobotsRiskyTransport /Safe Transports:\s*0.*$/
-syntax match RobotsGameOver /You've been.*/
+execute 'syntax match RobotsGameOver /'.g:robots_game_over.'/'
+execute 'syntax match RobotsPortals /'.g:robots_portal_intro.'/'
+execute 'syntax match RobotsPortals /'.g:robots_portal_warning.'/'
 
 highlight RobotsRobot        cterm=bold ctermfg=165 guifg=#df00ff
 highlight RobotsPlayer       cterm=bold ctermfg=40  guifg=#00df00
