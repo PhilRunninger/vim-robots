@@ -101,7 +101,7 @@ function! s:DrawGrid()   "{{{1
     endif
     if s:HorizontalPortalsAreOpen()
         execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'
-        execute 'silent 1,$s/^.\{'.3*(s:cols-1).'}\zs'.g:robots_empty.'/'.g:robots_portal.'/e'
+        execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'
     endif
     call append(0, ['',''])
     call s:UpdateScore(0)
