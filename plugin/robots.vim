@@ -13,8 +13,8 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_game_over =  'You were terminated! Another game?'
 
     tabnew
-    let s:playerShortcutRound = 2
-    let s:robotsShortcutRound = 3
+    let s:playerShortcutRound = 5
+    let s:robotsShortcutRound = s:playerShortcutRound + 4
     let s:transportRate = 5
     let s:width = getwininfo(win_getid())[0]['width']
     let s:height = getwininfo(win_getid())[0]['height']
@@ -92,7 +92,7 @@ function! s:DrawGrid()   "{{{1
     setlocal modifiable
     normal! ggdG
     for r in range(1,s:rows,1)
-        call append(0, strcharpart((r % 2 ? '' : '   ') . repeat(g:robots_empty . '     ', s:cols/2), 0, s:width))
+        call append(0, (r%2 ? '':'   ').trim(repeat(g:robots_empty.'     ',s:cols/2)))
     endfor
     execute 'g/^$/d'
     if s:VerticalPortalsAreOpen()
