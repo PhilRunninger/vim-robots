@@ -123,6 +123,18 @@ function! s:HorizontalPortalsAreOpen(forWhom = 'any')
     return s:PortalsAreOpen((s:round-s:playerShortcutRound) % 2 == 1, a:forWhom)
 endfunction
 
+function! s:Empty(position)   "{{{1
+    let [r,c] = a:position
+    if (r == 0 || r == s:rows-1) && s:VerticalPortalsAreOpen()
+        return g:robots_portal
+    endif
+    if (c == 0 || c == s:cols-1) && s:HorizontalPortalsAreOpen()
+        return g:robots_portal
+    endif
+
+    return g:robots_empty
+endfunction
+
 function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += (a:deltaScore * (s:finishingRound ? 2 : 1))
     setlocal modifiable
@@ -275,7 +287,7 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_empty)
+    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty(s:playerPos))
     let s:playerPos = newPos
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
     call s:MoveRobots()
@@ -308,7 +320,9 @@ function! s:MoveRobots()   "{{{1
         endif
     endfor
 
-    call s:DrawAll(s:robotsPos, g:robots_empty)
+    for position in s:robotsPos
+        call s:DrawAt(s:ToScreenPosition(position), s:Empty(position))
+    endfor
     let s:robotsPos = newRobotPos
     call s:DrawAll(s:robotsPos, g:robots_robot)
     call s:CreateJunkPiles()
