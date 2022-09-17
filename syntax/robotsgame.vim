@@ -28,9 +28,9 @@ highlight RobotsGameOver     cterm=bold ctermfg=196 guifg=#ff0000
 if &background == 'dark'
     highlight RobotsPortals         cterm=bold ctermfg=39  guifg=#00afff
     highlight RobotsEmpty           cterm=bold ctermfg=242 guifg=#666666
-    highlight RobotsTeleportTarget1 cterm=bold ctermfg=220 guifg=#ffdf00
-    highlight RobotsTeleportTarget2 cterm=bold ctermfg=228 guifg=#ffff87
-    highlight RobotsTeleportTarget3 cterm=bold ctermfg=231 guifg=#ffffff
+    highlight RobotsTeleportTarget1 cterm=bold ctermfg=220 guifg=#ffd700
+    highlight RobotsTeleportTarget2 cterm=bold ctermfg=226 guifg=#ffff00
+    highlight RobotsTeleportTarget3 cterm=bold ctermfg=228 guifg=#ffff87
     highlight RobotsSafeTransport   cterm=bold ctermfg=40  guifg=#00df00
     highlight RobotsRiskyTransport  cterm=bold ctermfg=160 guifg=#df0000
     highlight RobotsTitle           cterm=bold ctermfg=214 guifg=#ffaf00
