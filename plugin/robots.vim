@@ -7,6 +7,7 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_robot     = get(g:, 'robots_robot', '■')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player', '●')
+    let g:robots_portal    = get(g:, 'robots_portal', '○')
     let g:robots_portal_intro = 'Portals along the edge will transport you to the opposite side.'
     let g:robots_portal_warning =  'Oh no! The robots found the shortcuts. Watch out!'
     let g:robots_game_over =  'You were terminated! Another game?'
@@ -95,11 +96,11 @@ function! s:DrawGrid()   "{{{1
     endfor
     execute 'g/^$/d'
     if s:round >= s:playerShortcutRound
-        execute '1s/'.g:robots_empty.'/○/g'
-        execute '$s/'.g:robots_empty.'/○/g'
-        execute '1,$s/^'.g:robots_empty.'/○/'
-        execute '1,$s/^.\{'.3*(s:cols-1).'}\zs'.g:robots_empty.'/○/'
+        execute 'silent 1s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
+        execute 'silent $s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
     endif
+        execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'
+        execute 'silent 1,$s/^.\{'.3*(s:cols-1).'}\zs'.g:robots_empty.'/'.g:robots_portal.'/e'
     call append(0, ['',''])
     call s:UpdateScore(0)
     normal! 2gg
