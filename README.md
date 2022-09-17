@@ -21,7 +21,7 @@ Your avatar is the circle. Robots are squares, and the junk piles are triangles.
 
 The robots are programmed to pursue you at all costs. They will choose the shortest path diagonally or vertically. Horizontal movement requires them to randomly choose a diagonally up or down direction. Fortunately, they are oblivious to each other, and will collide, leaving a flaming pile of junk. Your objective is to lure all the robots to walk into a junk heap or another robot, while avoiding capture, so you can advance to the next round.
 
-In later rounds, you can take advantage of portals to travel instantl from one edge of the field to the opposite side. Eventually, the robots will catch on, and follow you through those portals too, so be careful.
+In later rounds, you can take advantage of portals to travel instantly from one edge of the field to the opposite side. Eventually, the robots will catch on, and follow you through those portals too, so be careful.
 
 ### Movement
 Move your avatar around the screen with these keys.
