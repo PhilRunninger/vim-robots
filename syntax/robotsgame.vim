@@ -3,9 +3,9 @@ execute 'syntax match RobotsPlayer /'.g:robots_player.'/'
 execute 'syntax match RobotsJunkPile /'.g:robots_junk_pile.'/'
 execute 'syntax match RobotsEmpty /'.g:robots_empty.'/'
 execute 'syntax match RobotsPortals /'.g:robots_portal.'/'
-syntax match RobotsTeleportTarget1 /✴/
-syntax match RobotsTeleportTarget2 /✶/
-syntax match RobotsTeleportTarget3 /✦/
+syntax match RobotsTeleportTarget1 /✹/
+syntax match RobotsTeleportTarget2 /✵/
+syntax match RobotsTeleportTarget3 /✶/
 syntax match RobotsPlayerDeath1 /×/
 syntax match RobotsPlayerDeath2 /x/
 syntax match RobotsPlayerDeath3 /X/
