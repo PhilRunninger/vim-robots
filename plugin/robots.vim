@@ -23,7 +23,7 @@ function! s:InitAndStartRobots()   "{{{1
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
     setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn nohlsearch
-    execute 'setlocal statusline='.g:robots_player.':you\ '.g:robots_robot.':robot\ '.g:robots_junk_pile.':junk\ pile\ \ yujkbn:Move\ \ w:Wait\ \ t:Transport\ \ F:Finish'
+    execute 'setlocal statusline='.g:robots_player.':you\ '.g:robots_robot.':robot\ '.g:robots_junk_pile.':junk\ pile\ '.g:robots_portal.':portal\ \ yujkbn:Move\ \ w:Wait\ \ t:Transport\ \ F:Finish'
 
     for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
         for key in keys
