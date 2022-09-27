@@ -60,9 +60,9 @@ function! s:StartNewRound()   "{{{1
     call s:DrawAll(s:robotsPos, g:robots_robot, 10)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 
-    if s:round == s:playerShortcutRound
+    if s:round == s:playerShortcutRound + 1
         call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_intro))/2, g:robots_portal_intro))
-    elseif s:round == s:robotsShortcutRound
+    elseif s:round == s:robotsShortcutRound + 1
         call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_warning))/2, g:robots_portal_warning))
     endif
 endfunction
