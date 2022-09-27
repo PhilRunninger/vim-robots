@@ -312,7 +312,7 @@ function! s:MoveRobots()   "{{{1
 
         if s:VerticalPortalsAreOpen('robot')
             let deltaRow = abs(deltaRow) > s:rows/2 ? -s:Sign(deltaRow) : s:Sign(deltaRow)
-        elseif robot[0]>0 && robot[0]<s:rows
+        elseif robot[0]>0 && robot[0]<s:rows - 1
             let deltaRow = s:Sign(deltaRow)
         else
             let deltaRow = robot[0]==0 ? 1 : -1
