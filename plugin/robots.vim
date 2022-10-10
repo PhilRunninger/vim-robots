@@ -96,8 +96,8 @@ function! s:DrawGrid()   "{{{1
     endfor
     execute 'g/^$/d'
     if s:VerticalPortalsAreOpen()
-        execute 'silent 1s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
-        execute 'silent $s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
+        execute 'silent 1,2s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
+        execute 'silent $,$-1s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
     endif
     if s:HorizontalPortalsAreOpen()
         execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'
@@ -115,17 +115,17 @@ function! s:PortalsAreOpen(open, forWhom)   "{{{1
                    \  (a:forWhom == 'robot' && s:round >= s:robotsShortcutRound))
 endfunction
 
-function! s:VerticalPortalsAreOpen(forWhom = 'any')
+function! s:VerticalPortalsAreOpen(forWhom = 'any')   "{{{1
     return s:PortalsAreOpen(((s:round-s:playerShortcutRound) / 2) % 2 == 1, a:forWhom)
 endfunction
 
-function! s:HorizontalPortalsAreOpen(forWhom = 'any')
+function! s:HorizontalPortalsAreOpen(forWhom = 'any')   "{{{1
     return s:PortalsAreOpen((s:round-s:playerShortcutRound) % 2 == 1, a:forWhom)
 endfunction
 
 function! s:Empty(position)   "{{{1
     let [r,c] = a:position
-    if (r == 0 || r == s:rows-1) && s:VerticalPortalsAreOpen()
+    if (r < 2 || r >= s:rows-2) && s:VerticalPortalsAreOpen()
         return g:robots_portal
     endif
     if (c == 0 || c == s:cols-1) && s:HorizontalPortalsAreOpen()
