@@ -97,8 +97,9 @@ function! s:DrawGrid()   "{{{1
     setlocal modifiable
     normal! ggdG
     for r in range(1,s:rows,1)
-        call append(0, (r%2 ? '':'   ').trim(repeat(g:robots_empty.'     ',s:cols/2)).(r%2 ? '   ':''))
+        call append(0, (r%2 ? '':'   ').trim(repeat(g:robots_empty.'     ',s:cols/2), ' ').(r%2 ? '   ':''))
     endfor
+
     execute 'g/^$/d'
     if s:VerticalPortalsAreOpen()
         execute 'silent 1,2s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
