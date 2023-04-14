@@ -111,10 +111,29 @@ function! s:DrawGrid()   "{{{1
     endfor
 
     execute 'g/^$/d'
-    if s:PortalsAreOpen(s:TOP)    | execute 'silent 1,2s/'.g:robots_empty.'/'.g:robots_portal.'/ge'   | endif
-    if s:PortalsAreOpen(s:RIGHT)  | execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'   | endif
-    if s:PortalsAreOpen(s:BOTTOM) | execute 'silent $,$-1s/'.g:robots_empty.'/'.g:robots_portal.'/ge' | endif
-    if s:PortalsAreOpen(s:LEFT)   | execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'   | endif
+
+    if s:PortalsAreOpen(s:TOP)
+        execute 'silent 1s/' .g:robots_empty.' /'.g:robots_empty.'⎽/ge'
+        execute 'silent 1s/ '.g:robots_empty.'/⎽'.g:robots_empty.'/ge'
+        execute 'silent 2s/' .g:robots_empty.' /'.g:robots_empty.'⎺/ge'
+        execute 'silent 2s/ '.g:robots_empty.'/⎺'.g:robots_empty.'/ge'
+        execute 'silent 1,2s/' .g:robots_empty.'/'.g:robots_portal.'/ge'
+    endif
+    if s:PortalsAreOpen(s:BOTTOM)
+        execute 'silent $s/'   .g:robots_empty.' /' .g:robots_empty.'⎺/ge'
+        execute 'silent $s/ '  .g:robots_empty. '/⎺'.g:robots_empty.'/ge'
+        execute 'silent $-1s/' .g:robots_empty.' /' .g:robots_empty.'⎽/ge'
+        execute 'silent $-1s/ '.g:robots_empty. '/⎽'.g:robots_empty.'/ge'
+        execute 'silent $-1,$s/'.g:robots_empty. '/'.g:robots_portal.'/ge'
+    endif
+    if s:PortalsAreOpen(s:LEFT)
+        execute 'silent 2,$-1s/^ /│/'
+        execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'
+    endif
+    if s:PortalsAreOpen(s:RIGHT)
+        execute 'silent 2,$-1s/ $/│/'
+        execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'
+    endif
     call append(0, ['',''])
     call s:UpdateScore(0)
     normal! 2gg
