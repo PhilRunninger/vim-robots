@@ -31,7 +31,7 @@ function! s:InitAndStartRobots()   "{{{1
             \   '%#RobotsPlayer#'  .g:robots_player   .'%#Normal#:you\ '       .
             \   '%#RobotsRobot#'   .g:robots_robot    .'%#Normal#:robot\ '     .
             \   '%#RobotsJunkPile#'.g:robots_junk_pile.'%#Normal#:junk\ pile\ '.
-            \   '%#RobotsPortals#' .g:robots_portal   .'%#Normal#:portal\ '    .
+            \   '%#RobotsPortals1#'.g:robots_portal   .'%#Normal#:portal\ '    .
             \   '\ yujkbn:Move\ \ w:Wait\ \ t:Transport\ \ F:Finish'
 
     for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
