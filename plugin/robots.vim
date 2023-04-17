@@ -84,7 +84,7 @@ endfunction
 
 function! s:RobotCount()   "{{{1
     let l:cells = (s:rows * s:cols / 2)  " # of cells on the board
-    return min([float2nr(s:round * (l:cells / 2) / 64), l:cells/2])
+    return float2nr(l:cells / 2 * tanh((s:round) / pow(l:cells, 2.0/3.0)))
 endfunction
 
 function! s:CreateRobotsAndPlayer()   "{{{1
