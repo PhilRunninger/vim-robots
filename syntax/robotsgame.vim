@@ -1,4 +1,5 @@
 execute 'syntax match RobotsRobot /'.g:robots_robot.'/'
+execute 'syntax match RobotsRobotPoo /'.g:robots_robot_poo.'/'
 execute 'syntax match RobotsPlayer /'.g:robots_player.'/'
 execute 'syntax match RobotsJunkPile /'.g:robots_junk_pile.'/'
 execute 'syntax match RobotsEmpty /'.g:robots_empty.'/'
@@ -18,7 +19,8 @@ execute 'syntax match RobotsPortals2 /[│⎺⎽]/'
 execute 'syntax match RobotsPortals2 /'.g:robots_portal_intro.'/'
 execute 'syntax match RobotsPortals2 /'.g:robots_portal_warning.'/'
 
-highlight RobotsRobot           cterm=bold ctermfg=165 guifg=#df00ff
+highlight RobotsRobot           cterm=bold ctermfg=165 guifg=#d700ff
+highlight RobotsRobotPoo        cterm=bold ctermfg=165 guifg=#ff87ff
 highlight RobotsPlayer          cterm=bold ctermfg=40  guifg=#00df00
 highlight RobotsJunkPile        cterm=bold ctermfg=208 guifg=#ff8700
 highlight RobotsPlayerDeath1    cterm=bold ctermfg=124 guifg=#af0000

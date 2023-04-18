@@ -5,9 +5,11 @@ command! Robots :call <SID>InitAndStartRobots()   "{{{1
 function! s:InitAndStartRobots()   "{{{1
     let g:robots_empty     = get(g:, 'robots_empty', '·')
     let g:robots_robot     = get(g:, 'robots_robot', '■')
+    let g:robots_robot_poo = get(g:, 'robots_robot_poo', '•')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player', '●')
     let g:robots_portal    = get(g:, 'robots_portal', '○')
+    let g:robots_border    = get(g:, 'robots_border', 0)
     let g:robots_portal_intro = 'Portals along the edge will transport you to the opposite side.'
     let g:robots_portal_warning =  'Oh no! The robots found the shortcuts. Watch out!'
     let g:robots_game_over =  'You were terminated! Another game?'
@@ -112,28 +114,31 @@ function! s:DrawGrid()   "{{{1
 
     execute 'g/^$/d'
 
-    if s:PortalsAreOpen(s:TOP)
-        execute 'silent 1s/' .g:robots_empty.' /'.g:robots_empty.'⎽/ge'
-        execute 'silent 1s/ '.g:robots_empty.'/⎽'.g:robots_empty.'/ge'
-        execute 'silent 2s/' .g:robots_empty.' /'.g:robots_empty.'⎺/ge'
-        execute 'silent 2s/ '.g:robots_empty.'/⎺'.g:robots_empty.'/ge'
-        execute 'silent 1,2s/' .g:robots_empty.'/'.g:robots_portal.'/ge'
+    if g:robots_border
+        if s:PortalsAreOpen(s:TOP)
+            execute 'silent 1s/' .g:robots_empty.' /'.g:robots_empty.'⎽/ge'
+            execute 'silent 1s/ '.g:robots_empty.'/⎽'.g:robots_empty.'/ge'
+            execute 'silent 2s/' .g:robots_empty.' /'.g:robots_empty.'⎺/ge'
+            execute 'silent 2s/ '.g:robots_empty.'/⎺'.g:robots_empty.'/ge'
+        endif
+        if s:PortalsAreOpen(s:BOTTOM)
+            execute 'silent $s/'   .g:robots_empty.' /' .g:robots_empty.'⎺/ge'
+            execute 'silent $s/ '  .g:robots_empty. '/⎺'.g:robots_empty.'/ge'
+            execute 'silent $-1s/' .g:robots_empty.' /' .g:robots_empty.'⎽/ge'
+            execute 'silent $-1s/ '.g:robots_empty. '/⎽'.g:robots_empty.'/ge'
+        endif
+        if s:PortalsAreOpen(s:LEFT)
+            execute 'silent 2,$-1s/^ /│/'
+        endif
+        if s:PortalsAreOpen(s:RIGHT)
+            execute 'silent 2,$-1s/ $/│/'
+        endif
     endif
-    if s:PortalsAreOpen(s:BOTTOM)
-        execute 'silent $s/'   .g:robots_empty.' /' .g:robots_empty.'⎺/ge'
-        execute 'silent $s/ '  .g:robots_empty. '/⎺'.g:robots_empty.'/ge'
-        execute 'silent $-1s/' .g:robots_empty.' /' .g:robots_empty.'⎽/ge'
-        execute 'silent $-1s/ '.g:robots_empty. '/⎽'.g:robots_empty.'/ge'
-        execute 'silent $-1,$s/'.g:robots_empty. '/'.g:robots_portal.'/ge'
-    endif
-    if s:PortalsAreOpen(s:LEFT)
-        execute 'silent 2,$-1s/^ /│/'
-        execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'
-    endif
-    if s:PortalsAreOpen(s:RIGHT)
-        execute 'silent 2,$-1s/ $/│/'
-        execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'
-    endif
+    if s:PortalsAreOpen(s:TOP)    | execute 'silent 1,2s/' .g:robots_empty.'/'.g:robots_portal.'/ge'   | endif
+    if s:PortalsAreOpen(s:BOTTOM) | execute 'silent $-1,$s/'.g:robots_empty. '/'.g:robots_portal.'/ge' | endif
+    if s:PortalsAreOpen(s:LEFT)   | execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'    | endif
+    if s:PortalsAreOpen(s:RIGHT)  | execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'    | endif
+
     call append(0, ['',''])
     call s:UpdateScore(0)
     normal! 2gg
@@ -148,6 +153,10 @@ function! s:PortalsAreOpen(direction, forWhom = 'any')   "{{{1
 endfunction
 
 function! s:Empty(position)   "{{{1
+    if s:finishingRound
+        return g:robots_robot_poo
+    endif
+
     let [r,c] = a:position
     if (r < 2 && s:PortalsAreOpen(s:TOP)) ||
      \ (r >= s:rows-2 && s:PortalsAreOpen(s:BOTTOM)) ||
