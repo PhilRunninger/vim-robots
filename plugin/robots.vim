@@ -9,7 +9,7 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player', '●')
     let g:robots_portal    = get(g:, 'robots_portal', '○')
-    let g:robots_border    = get(g:, 'robots_border', 0)
+    let g:robots_border    = get(g:, 'robots_border', 1)
     let g:robots_portal_intro = 'Portals along the edge will transport you to the opposite side.'
     let g:robots_portal_warning =  'Oh no! The robots found the shortcuts. Watch out!'
     let g:robots_game_over =  'You were terminated! Another game?'
