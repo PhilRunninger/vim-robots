@@ -172,8 +172,8 @@ function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += (a:deltaScore * (s:finishingRound ? 2 : 1))
     setlocal modifiable
     let l:safeTransports = trim(trim(printf('%.3f', 1.0*s:safeTransports/s:transportRate), '0', 2), '.', 2)
-    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %s',
-                         \ s:round, s:score, len(s:robotsPos), l:safeTransports))
+    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %3d of %-3d  Safe Transports: %s',
+                         \ s:round, s:score, len(s:robotsPos), s:RobotCount(), l:safeTransports))
     setlocal nomodifiable
 endfunction
 
