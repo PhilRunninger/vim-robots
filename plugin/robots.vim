@@ -82,6 +82,7 @@ function! s:StartNewRound()   "{{{1
     elseif s:round == s:robotsShortcutRound
         call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_warning))/2, g:robots_portal_warning))
     endif
+    normal! 2gg
 endfunction
 
 function! s:RobotCount()   "{{{1
@@ -113,36 +114,40 @@ function! s:DrawGrid()   "{{{1
     endfor
 
     execute 'g/^$/d'
-
-    if g:robots_border
-        if s:PortalsAreOpen(s:TOP)
-            execute 'silent 1s/' .g:robots_empty.' /'.g:robots_empty.'⎽/ge'
-            execute 'silent 1s/ '.g:robots_empty.'/⎽'.g:robots_empty.'/ge'
-            execute 'silent 2s/' .g:robots_empty.' /'.g:robots_empty.'⎺/ge'
-            execute 'silent 2s/ '.g:robots_empty.'/⎺'.g:robots_empty.'/ge'
-        endif
-        if s:PortalsAreOpen(s:BOTTOM)
-            execute 'silent $s/'   .g:robots_empty.' /' .g:robots_empty.'⎺/ge'
-            execute 'silent $s/ '  .g:robots_empty. '/⎺'.g:robots_empty.'/ge'
-            execute 'silent $-1s/' .g:robots_empty.' /' .g:robots_empty.'⎽/ge'
-            execute 'silent $-1s/ '.g:robots_empty. '/⎽'.g:robots_empty.'/ge'
-        endif
-        if s:PortalsAreOpen(s:LEFT)
-            execute 'silent 2,$-1s/^ /│/'
-        endif
-        if s:PortalsAreOpen(s:RIGHT)
-            execute 'silent 2,$-1s/ $/│/'
-        endif
-    endif
     if s:PortalsAreOpen(s:TOP)    | execute 'silent 1,2s/' .g:robots_empty.'/'.g:robots_portal.'/ge'   | endif
     if s:PortalsAreOpen(s:BOTTOM) | execute 'silent $-1,$s/'.g:robots_empty. '/'.g:robots_portal.'/ge' | endif
     if s:PortalsAreOpen(s:LEFT)   | execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'    | endif
     if s:PortalsAreOpen(s:RIGHT)  | execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'    | endif
-
     call append(0, ['',''])
+    call s:DrawBorder()
+
     call s:UpdateScore(0)
-    normal! 2gg
     setlocal nomodifiable
+endfunction
+
+function! s:DrawBorder()   "{{{1
+    if !g:robots_border
+        return
+    endif
+
+    if s:PortalsAreOpen(s:TOP)
+        execute 'silent 3s/' .g:robots_portal.' /'.g:robots_portal.'⎽/ge'
+        execute 'silent 3s/ '.g:robots_portal.'/⎽'.g:robots_portal.'/ge'
+        execute 'silent 4s/' .g:robots_portal.' /'.g:robots_portal.'⎺/ge'
+        execute 'silent 4s/ '.g:robots_portal.'/⎺'.g:robots_portal.'/ge'
+    endif
+    if s:PortalsAreOpen(s:BOTTOM)
+        execute 'silent $s/'   .g:robots_portal.' /' .g:robots_portal.'⎺/ge'
+        execute 'silent $s/ '  .g:robots_portal. '/⎺'.g:robots_portal.'/ge'
+        execute 'silent $-1s/' .g:robots_portal.' /' .g:robots_portal.'⎽/ge'
+        execute 'silent $-1s/ '.g:robots_portal. '/⎽'.g:robots_portal.'/ge'
+    endif
+    if s:PortalsAreOpen(s:LEFT)
+        execute 'silent 4,$-1s/^ /│/e'
+    endif
+    if s:PortalsAreOpen(s:RIGHT)
+        execute 'silent 4,$-1s/ $/│/e'
+    endif
 endfunction
 
 function! s:PortalsAreOpen(direction, forWhom = 'any')   "{{{1
@@ -321,6 +326,9 @@ function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
         redraw
         sleep 100m
     endfor
+    setlocal modifiable
+    call s:DrawBorder()
+    setlocal nomodifiable
 endfunction
 
 function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
