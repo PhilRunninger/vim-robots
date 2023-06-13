@@ -3,16 +3,16 @@
 command! Robots :call <SID>InitAndStartRobots()   "{{{1
 
 function! s:InitAndStartRobots()   "{{{1
-    let g:robots_empty     = get(g:, 'robots_empty', '·')
-    let g:robots_robot     = get(g:, 'robots_robot', '■')
+    let g:robots_empty     = get(g:, 'robots_empty',     '·')
+    let g:robots_robot     = get(g:, 'robots_robot',     '■')
     let g:robots_robot_poo = get(g:, 'robots_robot_poo', '•')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
-    let g:robots_player    = get(g:, 'robots_player', '●')
-    let g:robots_portal    = get(g:, 'robots_portal', '○')
-    let g:robots_border    = get(g:, 'robots_border', 1)
-    let g:robots_portal_intro = 'Portals along the edge will transport you to the opposite side.'
-    let g:robots_portal_warning =  'Oh no! The robots found the shortcuts. Watch out!'
-    let g:robots_game_over =  'You were terminated! Another game?'
+    let g:robots_player    = get(g:, 'robots_player',    '●')
+    let g:robots_portal    = get(g:, 'robots_portal',    '○')
+    let g:robots_border    = get(g:, 'robots_border',     1 )
+    let g:robots_portal_intro   = 'Portals are activated.'
+    let g:robots_portal_warning = 'The robots can now use portals too. Be careful!'
+    let g:robots_game_over      = 'You were terminated! Another game?'
 
     tabnew
     let s:playerShortcutRound = 4
@@ -77,11 +77,9 @@ function! s:StartNewRound()   "{{{1
     call s:DrawAll(s:robotsPos, g:robots_robot, 10)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 
-    if s:round == s:playerShortcutRound
-        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_intro))/2, g:robots_portal_intro))
-    elseif s:round == s:robotsShortcutRound
-        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_warning))/2, g:robots_portal_warning))
-    endif
+    let msg = s:round < s:playerShortcutRound ? '' : g:robots_portal_intro
+    let msg .= s:round < s:robotsShortcutRound ? '' : ('  ' . g:robots_portal_warning)
+    call s:DrawAt([2,1], printf('%*s', (s:width+strchars(msg))/2, msg))
 endfunction
 
 function! s:RobotCount()   "{{{1
