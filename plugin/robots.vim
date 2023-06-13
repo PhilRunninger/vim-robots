@@ -82,7 +82,6 @@ function! s:StartNewRound()   "{{{1
     elseif s:round == s:robotsShortcutRound
         call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_warning))/2, g:robots_portal_warning))
     endif
-    normal! 2gg
 endfunction
 
 function! s:RobotCount()   "{{{1
@@ -122,6 +121,7 @@ function! s:DrawGrid()   "{{{1
     call s:DrawBorder()
 
     call s:UpdateScore(0)
+    normal! 2gg
     setlocal nomodifiable
 endfunction
 
@@ -308,6 +308,7 @@ endfunction
 
 function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
     let cells = map([[-1,-1],[-1,0],[-1,1],[0,2],[1,1],[1,0],[1,-1],[0,-2]], {_,val -> [val[0]+a:cell[0], val[1]+a:cell[1]]})
+    let old_chars = map(copy(cells), {_,v -> strcharpart(getline(v[0]), v[1]-1, 1)})
     for sparkles in [a:beamOn, a:beamOff]
         for sparkle in sparkles
             let random = map(range(8*strchars(sparkle)), {_ -> Random(1000000)})
@@ -316,7 +317,8 @@ function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
                 let [r,c] = cells[max % 8]
                 let random[max] = -1
                 if r > 2 && r <= line('$') && c > 0 && c <= strchars(getline(r))
-                    call s:DrawAt([r,c], strcharpart(sparkle,max/8,1))
+                    let idx = index(cells,[r,c])
+                    call s:DrawAt([r,c], sparkle == ' ' ? old_chars[idx] : strcharpart(sparkle,max/8,1))
                 endif
                 redraw
                 sleep 25m
@@ -326,9 +328,6 @@ function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
         redraw
         sleep 100m
     endfor
-    setlocal modifiable
-    call s:DrawBorder()
-    setlocal nomodifiable
 endfunction
 
 function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
