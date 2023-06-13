@@ -157,8 +157,8 @@ function! s:PortalsAreOpen(direction, forWhom = 'any')   "{{{1
           \  (a:forWhom == 'robot' && s:round >= s:robotsShortcutRound))
 endfunction
 
-function! s:Empty(position)   "{{{1
-    if s:finishingRound
+function! s:Empty(who, position)   "{{{1
+    if s:finishingRound && a:who == 'robot'
         return g:robots_robot_poo
     endif
 
@@ -242,7 +242,7 @@ endfunction
 
 function! s:Transport()   "{{{1
     let l:startPt = s:ToScreenPosition(s:playerPos)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
     let s:playerPos = s:RandomPosition()
     if s:safeTransports >= s:transportRate
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
@@ -335,7 +335,7 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty(s:playerPos))
+    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty('player', s:playerPos))
     let s:playerPos = newPos
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
     call s:MoveRobots()
@@ -383,7 +383,7 @@ function! s:MoveRobots()   "{{{1
     endfor
 
     for position in s:robotsPos
-        call s:DrawAt(s:ToScreenPosition(position), s:Empty(position))
+        call s:DrawAt(s:ToScreenPosition(position), s:Empty('robot', position))
     endfor
     let s:robotsPos = newRobotPos
     call s:DrawAll(s:robotsPos, g:robots_robot)
@@ -420,7 +420,7 @@ function! s:Continue()   "{{{1
         call s:PlayAnother()
     elseif s:PlayerWinsRound()
         call s:DrawAll(s:junkPilesPos, g:robots_empty, 25)
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
         call s:StartNewRound()
     endif
 endfunction
@@ -432,7 +432,7 @@ function! s:PlayAnother()   "{{{1
     setlocal nomodifiable
     redraw!
     if nr2char(getchar()) ==? 'y'
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
         call s:StartNewGame()
     else
         bwipeout
