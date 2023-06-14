@@ -3,23 +3,29 @@
 command! Robots :call <SID>InitAndStartRobots()   "{{{1
 
 function! s:InitAndStartRobots()   "{{{1
-    let g:robots_empty     = get(g:, 'robots_empty', '·')
-    let g:robots_robot     = get(g:, 'robots_robot', '■')
+    let g:robots_empty     = get(g:, 'robots_empty',     '·')
+    let g:robots_robot     = get(g:, 'robots_robot',     '■')
+    let g:robots_robot_poo = get(g:, 'robots_robot_poo', '•')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
-    let g:robots_player    = get(g:, 'robots_player', '●')
-    let g:robots_portal    = get(g:, 'robots_portal', '○')
-    let g:robots_portal_intro = 'Portals along the edge will transport you to the opposite side.'
-    let g:robots_portal_warning =  'Oh no! The robots found the shortcuts. Watch out!'
-    let g:robots_game_over =  'You were terminated! Another game?'
+    let g:robots_player    = get(g:, 'robots_player',    '●')
+    let g:robots_portal    = get(g:, 'robots_portal',    '○')
+    let g:robots_border    = get(g:, 'robots_border',     1 )
+    let g:robots_portal_intro   = 'Portals are activated.'
+    let g:robots_portal_warning = 'The robots can now use portals too. Be careful!'
+    let g:robots_game_over      = 'You were terminated! Another game?'
 
     tabnew
-    let s:playerShortcutRound = 5
-    let s:robotsShortcutRound = s:playerShortcutRound + 4
+    let s:playerShortcutRound = 4
+    let s:robotsShortcutRound = s:playerShortcutRound + 6
     let s:transportRate = 5
     let s:width = getwininfo(win_getid())[0]['width']
     let s:height = getwininfo(win_getid())[0]['height']
     let s:cols = 2*float2nr((s:width+2)/6)
     let s:rows = 2*float2nr(s:height/2) - 2
+    let s:TOP = 1
+    let s:RIGHT = 2
+    let s:BOTTOM = 4
+    let s:LEFT = 8
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
     setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn nohlsearch
@@ -27,7 +33,7 @@ function! s:InitAndStartRobots()   "{{{1
             \   '%#RobotsPlayer#'  .g:robots_player   .'%#Normal#:you\ '       .
             \   '%#RobotsRobot#'   .g:robots_robot    .'%#Normal#:robot\ '     .
             \   '%#RobotsJunkPile#'.g:robots_junk_pile.'%#Normal#:junk\ pile\ '.
-            \   '%#RobotsPortals#' .g:robots_portal   .'%#Normal#:portal\ '    .
+            \   '%#RobotsPortals1#'.g:robots_portal   .'%#Normal#:portal\ '    .
             \   '\ yujkbn:Move\ \ w:Wait\ \ t:Transport\ \ F:Finish'
 
     for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
@@ -55,6 +61,12 @@ endfunction
 
 function! s:StartNewRound()   "{{{1
     let s:round += 1
+
+    let s:activePortals = Random(16)  " 4-bit number, one per direction.
+    while (s:round == s:playerShortcutRound || s:round == s:robotsShortcutRound) && s:activePortals == 0
+        let s:activePortals = Random(16)
+    endwhile
+
     let s:finishingRound = v:false
     let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
 
@@ -65,16 +77,14 @@ function! s:StartNewRound()   "{{{1
     call s:DrawAll(s:robotsPos, g:robots_robot, 10)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 
-    if s:round == s:playerShortcutRound + 1
-        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_intro))/2, g:robots_portal_intro))
-    elseif s:round == s:robotsShortcutRound + 1
-        call s:DrawAt([2,1], printf('%*s', (s:width+strchars(g:robots_portal_warning))/2, g:robots_portal_warning))
-    endif
+    let msg = s:round < s:playerShortcutRound ? '' : g:robots_portal_intro
+    let msg .= s:round < s:robotsShortcutRound ? '' : ('  ' . g:robots_portal_warning)
+    call s:DrawAt([2,1], printf('%*s', (s:width+strchars(msg))/2, msg))
 endfunction
 
 function! s:RobotCount()   "{{{1
     let l:cells = (s:rows * s:cols / 2)  " # of cells on the board
-    return float2nr(l:cells * tanh((s:round) / pow(l:cells, 0.66)))
+    return float2nr(l:cells / 2 * tanh((s:round) / pow(l:cells, 2.0/3.0)))
 endfunction
 
 function! s:CreateRobotsAndPlayer()   "{{{1
@@ -101,40 +111,60 @@ function! s:DrawGrid()   "{{{1
     endfor
 
     execute 'g/^$/d'
-    if s:VerticalPortalsAreOpen()
-        execute 'silent 1,2s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
-        execute 'silent $,$-1s/'.g:robots_empty.'/'.g:robots_portal.'/ge'
-    endif
-    if s:HorizontalPortalsAreOpen()
-        execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'
-        execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'
-    endif
+    if s:PortalsAreOpen(s:TOP)    | execute 'silent 1,2s/' .g:robots_empty.'/'.g:robots_portal.'/ge'   | endif
+    if s:PortalsAreOpen(s:BOTTOM) | execute 'silent $-1,$s/'.g:robots_empty. '/'.g:robots_portal.'/ge' | endif
+    if s:PortalsAreOpen(s:LEFT)   | execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'    | endif
+    if s:PortalsAreOpen(s:RIGHT)  | execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'    | endif
     call append(0, ['',''])
+    call s:DrawBorder()
+
     call s:UpdateScore(0)
     normal! 2gg
     setlocal nomodifiable
 endfunction
 
-function! s:PortalsAreOpen(open, forWhom)   "{{{1
-    return a:open && ( a:forWhom == 'any' ||
-                   \  (a:forWhom == 'player' && s:round >= s:playerShortcutRound) ||
-                   \  (a:forWhom == 'robot' && s:round >= s:robotsShortcutRound))
-endfunction
-
-function! s:VerticalPortalsAreOpen(forWhom = 'any')   "{{{1
-    return s:PortalsAreOpen(((s:round-s:playerShortcutRound) / 2) % 2 == 1, a:forWhom)
-endfunction
-
-function! s:HorizontalPortalsAreOpen(forWhom = 'any')   "{{{1
-    return s:PortalsAreOpen((s:round-s:playerShortcutRound) % 2 == 1, a:forWhom)
-endfunction
-
-function! s:Empty(position)   "{{{1
-    let [r,c] = a:position
-    if (r < 2 || r >= s:rows-2) && s:VerticalPortalsAreOpen()
-        return g:robots_portal
+function! s:DrawBorder()   "{{{1
+    if !g:robots_border
+        return
     endif
-    if (c == 0 || c == s:cols-1) && s:HorizontalPortalsAreOpen()
+
+    if s:PortalsAreOpen(s:TOP)
+        execute 'silent 3s/' .g:robots_portal.' /'.g:robots_portal.'⎽/ge'
+        execute 'silent 3s/ '.g:robots_portal.'/⎽'.g:robots_portal.'/ge'
+        execute 'silent 4s/' .g:robots_portal.' /'.g:robots_portal.'⎺/ge'
+        execute 'silent 4s/ '.g:robots_portal.'/⎺'.g:robots_portal.'/ge'
+    endif
+    if s:PortalsAreOpen(s:BOTTOM)
+        execute 'silent $s/'   .g:robots_portal.' /' .g:robots_portal.'⎺/ge'
+        execute 'silent $s/ '  .g:robots_portal. '/⎺'.g:robots_portal.'/ge'
+        execute 'silent $-1s/' .g:robots_portal.' /' .g:robots_portal.'⎽/ge'
+        execute 'silent $-1s/ '.g:robots_portal. '/⎽'.g:robots_portal.'/ge'
+    endif
+    if s:PortalsAreOpen(s:LEFT)
+        execute 'silent 4,$-1s/^ /│/e'
+    endif
+    if s:PortalsAreOpen(s:RIGHT)
+        execute 'silent 4,$-1s/ $/│/e'
+    endif
+endfunction
+
+function! s:PortalsAreOpen(direction, forWhom = 'any')   "{{{1
+    return and(s:activePortals, a:direction) != 0 &&
+          \ ((a:forWhom == 'any' && s:round >= s:playerShortcutRound) ||
+          \  (a:forWhom == 'player' && s:round >= s:playerShortcutRound) ||
+          \  (a:forWhom == 'robot' && s:round >= s:robotsShortcutRound))
+endfunction
+
+function! s:Empty(who, position)   "{{{1
+    if s:finishingRound && a:who == 'robot'
+        return g:robots_robot_poo
+    endif
+
+    let [r,c] = a:position
+    if (r < 2 && s:PortalsAreOpen(s:TOP)) ||
+     \ (r >= s:rows-2 && s:PortalsAreOpen(s:BOTTOM)) ||
+     \ (c == 0 && s:PortalsAreOpen(s:LEFT)) ||
+     \ (c == s:cols-1 && s:PortalsAreOpen(s:RIGHT))
         return g:robots_portal
     endif
 
@@ -145,8 +175,8 @@ function! s:UpdateScore(deltaScore)   "{{{1
     let s:score += (a:deltaScore * (s:finishingRound ? 2 : 1))
     setlocal modifiable
     let l:safeTransports = trim(trim(printf('%.3f', 1.0*s:safeTransports/s:transportRate), '0', 2), '.', 2)
-    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %-3d  Safe Transports: %s',
-                         \ s:round, s:score, len(s:robotsPos), l:safeTransports))
+    call setline(1, printf('ROBOTS  Round: %-3d  Score: %-3d  Robots Remaining: %3d of %-3d  Safe Transports: %s',
+                         \ s:round, s:score, len(s:robotsPos), s:RobotCount(), l:safeTransports))
     setlocal nomodifiable
 endfunction
 
@@ -186,13 +216,15 @@ function! s:NewPosition(position, deltaRow, deltaCol, forWhom)   "{{{1
     let [r,c] = a:position
     let r += a:deltaRow
     let c += a:deltaCol
-    if s:VerticalPortalsAreOpen(a:forWhom)
+    if (r < 0 && s:PortalsAreOpen(s:TOP, a:forWhom)) ||
+     \ (r >= s:rows && s:PortalsAreOpen(s:BOTTOM, a:forWhom))
         let r = (r + s:rows) % s:rows
     elseif r < 0 || r >= s:rows
         return a:position
     endif
 
-    if s:HorizontalPortalsAreOpen(a:forWhom)
+    if (c < 0 && s:PortalsAreOpen(s:LEFT, a:forWhom)) ||
+     \ (c >= s:cols && s:PortalsAreOpen(s:RIGHT, a:forWhom))
         let c = (c + s:cols) % s:cols
     elseif c < 0 || c >= s:cols
         return a:position
@@ -208,7 +240,7 @@ endfunction
 
 function! s:Transport()   "{{{1
     let l:startPt = s:ToScreenPosition(s:playerPos)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
     let s:playerPos = s:RandomPosition()
     if s:safeTransports >= s:transportRate
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
@@ -274,6 +306,7 @@ endfunction
 
 function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
     let cells = map([[-1,-1],[-1,0],[-1,1],[0,2],[1,1],[1,0],[1,-1],[0,-2]], {_,val -> [val[0]+a:cell[0], val[1]+a:cell[1]]})
+    let old_chars = map(copy(cells), {_,v -> strcharpart(getline(v[0]), v[1]-1, 1)})
     for sparkles in [a:beamOn, a:beamOff]
         for sparkle in sparkles
             let random = map(range(8*strchars(sparkle)), {_ -> Random(1000000)})
@@ -282,7 +315,8 @@ function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
                 let [r,c] = cells[max % 8]
                 let random[max] = -1
                 if r > 2 && r <= line('$') && c > 0 && c <= strchars(getline(r))
-                    call s:DrawAt([r,c], strcharpart(sparkle,max/8,1))
+                    let idx = index(cells,[r,c])
+                    call s:DrawAt([r,c], sparkle == ' ' ? old_chars[idx] : strcharpart(sparkle,max/8,1))
                 endif
                 redraw
                 sleep 25m
@@ -299,7 +333,7 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty(s:playerPos))
+    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty('player', s:playerPos))
     let s:playerPos = newPos
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
     call s:MoveRobots()
@@ -316,19 +350,23 @@ function! s:MoveRobots()   "{{{1
         let deltaRow = s:playerPos[0] == robot[0] ? 2*Random(2)-1 : s:playerPos[0] - robot[0]
         let deltaCol = s:playerPos[1] - robot[1]
 
-        if s:VerticalPortalsAreOpen('robot')
-            let deltaRow = abs(deltaRow) > s:rows/2 ? -s:Sign(deltaRow) : s:Sign(deltaRow)
-        elseif robot[0]>0 && robot[0]<s:rows - 1
+        if s:PortalsAreOpen(s:TOP, 'robot') && abs(deltaRow-s:rows) < abs(deltaRow) " wrap-around going up
+            let deltaRow = -1
+        elseif s:PortalsAreOpen(s:BOTTOM, 'robot') && abs(deltaRow+s:rows) < abs(deltaRow) " wrap-around going down
+            let deltaRow = 1
+        elseif robot[0]>0 && robot[0]<s:rows - 1 " middle of the field
             let deltaRow = s:Sign(deltaRow)
         else
-            let deltaRow = robot[0]==0 ? 1 : -1
+            let deltaRow = robot[0]==0 ? 1 : -1 " on the edge, no wrap-around
         endif
-        let deltaRow *= (deltaCol == 0 ? 2 : 1)
+        let deltaRow *= (deltaCol == 0 ? 2 : 1) " going straight up or down is two rows, not one.
 
-        if s:HorizontalPortalsAreOpen('robot')
-            let deltaCol = abs(deltaCol) > s:cols/2 ? -s:Sign(deltaCol) : s:Sign(deltaCol)
+        if s:PortalsAreOpen(s:LEFT, 'robot') && abs(deltaCol-s:cols) < abs(deltaCol) " wrap-around going left
+            let deltaCol = -1
+        elseif s:PortalsAreOpen(s:RIGHT, 'robot') && abs(deltaCol+s:cols) < abs(deltaCol) "wrap-around going right
+            let deltaCol = 1
         else
-            let deltaCol = s:Sign(deltaCol)
+            let deltaCol = s:Sign(deltaCol) " no wrap-around
         endif
 
         let newPos = s:NewPosition(robot, deltaRow, deltaCol, 'robot')
@@ -343,7 +381,7 @@ function! s:MoveRobots()   "{{{1
     endfor
 
     for position in s:robotsPos
-        call s:DrawAt(s:ToScreenPosition(position), s:Empty(position))
+        call s:DrawAt(s:ToScreenPosition(position), s:Empty('robot', position))
     endfor
     let s:robotsPos = newRobotPos
     call s:DrawAll(s:robotsPos, g:robots_robot)
@@ -380,7 +418,7 @@ function! s:Continue()   "{{{1
         call s:PlayAnother()
     elseif s:PlayerWinsRound()
         call s:DrawAll(s:junkPilesPos, g:robots_empty, 25)
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
         call s:StartNewRound()
     endif
 endfunction
@@ -392,7 +430,7 @@ function! s:PlayAnother()   "{{{1
     setlocal nomodifiable
     redraw!
     if nr2char(getchar()) ==? 'y'
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
         call s:StartNewGame()
     else
         bwipeout

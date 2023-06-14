@@ -53,12 +53,14 @@ Key | Function
 A safe transport ensures you won't be killed when transporting. You start out with none, which means you **could** land on a robot or junk pile, and die immediately. You can earn safe transports though, by using the <kbd>F</kbd> key to finish a round. Any robots defeated while finishing a round count toward your safe transports. Defeating five robots in this manner earns you one safe transport.
 
 ## Customization
-The characters used to represent various items can be changed to your liking. Just set one or more of these variables in your `.vimrc`:
+The characters used to represent various items can be changed to your liking. Robot poo is left by the robots when you finish the round by pressing <kbd>F</kbd>. When portals are drawn on the edge of the window, Unicode characters are used to approximate a connected edge between them. The statements shown here are what you'd use to get the retro look or to prevent using Unicode characters. The default values are in the comments following each statment.
 
-Variable | Default | Example (for the retro look.)
----|:-:|---
-`g:robots_empty`     | · | `let g:robots_empty = "\u00a0"`
-`g:robots_robot`     | ■ | `let g:robots_robot = '+'`
-`g:robots_junk_pile` | ▲ | `let g:robots_junk_pile = '*'`
-`g:robots_player`    | ● | `let g:robots_player = '@'`
-`g:robots_portal`    | ○ | No equivalent
+```vim
+let g:robots_empty = "\u00a0"            " Default: ·  An unoccupied cell on the board
+let g:robots_robot = '+'                 " Default: ■  A bad guy
+let g:robots_robot_poo = g:robots_empty  " Default: •  The trail taken by robots after pressing F
+let g:robots_junk_pile = '*'             " Default: ▲  A junk pile
+let g:robots_player = '@'                " Default: ●  The good guy
+let`g:robots_portal = 'o'                " Default: ○  A portal you can use to escape danger
+let g:robots_border = 0                  " Default: 1  Draw (or not) lines between portals
+```
