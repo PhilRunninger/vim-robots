@@ -8,14 +8,14 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_robot_poo = get(g:, 'robots_robot_poo', '•')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player',    '●')
-    let g:robots_portal    = get(g:, 'robots_portal',    '○')
+    let g:robots_portal    = get(g:, 'robots_portal',    '⊙')
     let g:robots_border    = get(g:, 'robots_border',     1 )
     let g:robots_portal_intro   = 'Portals are activated.'
-    let g:robots_portal_warning = 'The robots can now use portals too. Be careful!'
+    let g:robots_portal_warning = 'Be careful! The robots will pursue you through them now.'
     let g:robots_game_over      = 'You were terminated! Another game?'
 
     tabnew
-    let s:playerShortcutRound = 4
+    let s:playerShortcutRound = 6
     let s:robotsShortcutRound = s:playerShortcutRound + 6
     let s:transportRate = 5
     let s:width = getwininfo(win_getid())[0]['width']
@@ -62,10 +62,7 @@ endfunction
 function! s:StartNewRound()   "{{{1
     let s:round += 1
 
-    let s:activePortals = Random(16)  " 4-bit number, one per direction.
-    while (s:round == s:playerShortcutRound || s:round == s:robotsShortcutRound) && s:activePortals == 0
-        let s:activePortals = Random(16)
-    endwhile
+    let s:activePortals = s:round == s:playerShortcutRound ? 15 : Random(16)  " 4-bit number, one per direction.
 
     let s:finishingRound = v:false
     let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
