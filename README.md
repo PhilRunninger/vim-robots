@@ -8,14 +8,14 @@ There is one key difference between the classic game and this modern Vim update.
 ![Robots on Cartesian grid](https://upload.wikimedia.org/wikipedia/commons/b/bf/Robots_text_screenshot.png)
 <br/>**Figure 1:** *Robots on Cartesian grid*
 
-but this reincarnation is based on a hexagonal grid, with movement in only 6 directions. *Disclaimer: the hexagonal tiling and letters <kbd>y</kbd>, <kbd>k</kbd>, <kbd>u</kbd>, <kbd>n</kbd>, <kbd>j</kbd>, and <kbd>b</kbd> in the image below are for illustrative purposes only, and are not generated during gameplay.*
+but this reincarnation is based on a hexagonal grid, with movement in only 6 directions. *Disclaimer: the hexagonal tiling and letters (<kbd>y</kbd>, <kbd>k</kbd>, <kbd>u</kbd>, <kbd>n</kbd>, <kbd>j</kbd>, and <kbd>b</kbd>) in the image below are for illustrative purposes only, and are not generated during gameplay.*
 
-![Robots on a hexagonal grid](https://github.com/PhilRunninger/vim-robots/raw/master/HexRobots.png)
+![Robots on a hexagonal grid](HexRobots.png)
 <br/>**Figure 2:** *Vim-Robots on a hexagonal grid*
 
 ## Installation
 
-Use your favorite plugin manager. [vim-pathogen](https://github.com/tpope/vim-pathogen), [vim-plug](https://github.com/junegunn/vim-plug), and [Packer.nvim](https://github.com/wbthomason/packer.nvim) are some of the more popular options. Alternatively, with Vim 8+ or Neovim, you can use packages, as Greg Hurrell describes in his excellent Youtube video: [Vim screencast #75: Plugin managers](https://www.youtube.com/watch?v=X2_R3uxDN6g)
+Use your favorite plugin manager. [vim-pathogen](https://github.com/tpope/vim-pathogen), [vim-plug](https://github.com/junegunn/vim-plug), and [Packer.nvim](https://github.com/wbthomason/packer.nvim) are some of the more popular options. Alternatively, with Vim 8+ or Neovim, you can use packages, as Greg Hurrell (@wincent) describes in his excellent Youtube video: [Vim screencast #75: Plugin managers](https://www.youtube.com/watch?v=X2_R3uxDN6g)
 
 ## Playing the game
 
@@ -23,7 +23,7 @@ Start a game with the `:Robots` command.
 
 You are the green solid circle. Robots are purple squares, and the junk piles are orange triangles. *Your colors may vary, depending on your Vim colorscheme and/or terminal color settings.*
 
-The robots are programmed to pursue you at all costs. They will choose the shortest path diagonally or vertically. Horizontal movement requires them to randomly choose a diagonally up or down direction. Fortunately, they are oblivious to each other, and will collide, leaving a flaming pile of junk. Your objective is to lure all the robots to walk into a junk heap or another robot, while avoiding capture, allowing you can advance to the next level.
+The robots are programmed to pursue you at all costs, and will choose the shortest path to do so. They move in a straight line diagonally or vertically, but horizontal movement requires them to zig-zag randomly toward you. Fortunately, the robots are oblivious to each other, and will collide, leaving a flaming pile of junk. Your objective is to lure all the robots to walk into a junk pile or another robot, while avoiding capture, allowing you to advance to the next level.
 
 In later levels, you can take advantage of portals to travel instantly from one edge of the field to the opposite side. Eventually, the robots will catch on, and track you down through those portals too, so be careful.
 
