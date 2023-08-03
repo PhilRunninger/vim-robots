@@ -26,8 +26,10 @@ function! s:InitAndStartRobots()   "{{{1
     let s:LEFT = 8
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
-    setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn nohlsearch
     setlocal statusline=%{%RobotsStatusline()%}
+    setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn
+    let s:hlsearch = &hlsearch  " Remember the setting so it can be restored.
+    set nohlsearch              " 'hlsearch' is a global setting
 
     for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
         for key in keys
@@ -449,6 +451,7 @@ function! s:PlayAnother()   "{{{1
         call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
         call s:StartNewGame()
     else
+        let &hlsearch = s:hlsearch
         bwipeout
     endif
 endfunction
