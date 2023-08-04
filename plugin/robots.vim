@@ -5,7 +5,6 @@ command! Robots :call <SID>InitAndStartRobots()   "{{{1
 function! s:InitAndStartRobots()   "{{{1
     let g:robots_empty     = get(g:, 'robots_empty',     '·')
     let g:robots_robot     = get(g:, 'robots_robot',     '■')
-    let g:robots_trails    = get(g:, 'robots_trails',    '•')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player',    '●')
     let g:robots_portal    = get(g:, 'robots_portal',    '⊙')
@@ -175,11 +174,7 @@ function! s:PortalsAreOpen(direction, forWhom = 'player')   "{{{1
           \  (a:forWhom == 'robot' && s:level >= s:levelPortalsAllowRobots))
 endfunction
 
-function! s:Empty(who, position)   "{{{1
-    if s:finishingLevel && a:who == 'robot'
-        return g:robots_trails
-    endif
-
+function! s:Empty(position)   "{{{1
     let [r,c] = a:position
     if (r < 2 && s:PortalsAreOpen(s:TOP)) ||
      \ (r >= s:rows-2 && s:PortalsAreOpen(s:BOTTOM)) ||
@@ -257,7 +252,7 @@ endfunction
 function! s:Transport()   "{{{1
     unlet! s:showKeys
     let l:startPt = s:ToScreenPosition(s:playerPos)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
     let s:playerPos = s:RandomPosition()
     if s:shield >= s:shieldFull
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
@@ -351,7 +346,7 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty('player', s:playerPos))
+    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty(s:playerPos))
     let s:playerPos = newPos
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
     call s:MoveRobots()
@@ -400,7 +395,7 @@ function! s:MoveRobots()   "{{{1
     endfor
 
     for position in s:robotsPos
-        call s:DrawAt(s:ToScreenPosition(position), s:Empty('robot', position))
+        call s:DrawAt(s:ToScreenPosition(position), s:Empty(position))
     endfor
     let s:robotsPos = newRobotPos
     call s:DrawAll(s:robotsPos, g:robots_robot)
@@ -437,7 +432,7 @@ function! s:Continue()   "{{{1
         call s:PlayAnother()
     elseif s:PlayerWinsLevel()
         call s:DrawAll(s:junkPilesPos, g:robots_empty, 25)
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
         call s:StartNewLevel()
     endif
 endfunction
@@ -448,7 +443,7 @@ function! s:PlayAnother()   "{{{1
     setlocal nomodifiable
     redraw!
     if nr2char(getchar()) ==? 'y'
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty('player', s:playerPos), [' '])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
         call s:StartNewGame()
     else
         let &hlsearch = s:hlsearch

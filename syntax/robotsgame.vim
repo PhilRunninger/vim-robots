@@ -1,5 +1,4 @@
 execute 'syntax match RobotsRobot /'.g:robots_robot.'/'
-execute 'syntax match RobotsTrails /'.g:robots_trails.'/'
 execute 'syntax match RobotsPlayer /'.g:robots_player.'/'
 execute 'syntax match RobotsJunkPile /'.g:robots_junk_pile.'/'
 execute 'syntax match RobotsEmpty /'.g:robots_empty.'/'
@@ -14,7 +13,6 @@ syntax match RobotsPlayerDeath2 /x/
 syntax match RobotsPlayerDeath3 /X/
 
 highlight RobotsRobot           cterm=bold ctermfg=165 guifg=#d700ff
-highlight RobotsTrails          cterm=bold ctermfg=165 guifg=#ff87ff
 highlight RobotsPlayer          cterm=bold ctermfg=40  guifg=#00df00
 highlight RobotsJunkPile        cterm=bold ctermfg=208 guifg=#ff8700
 highlight RobotsPlayerDeath1    cterm=bold ctermfg=124 guifg=#af0000
