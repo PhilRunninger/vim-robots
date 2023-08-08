@@ -72,12 +72,13 @@ function! RobotsStatusline()   "{{{1
                 \ '%%#Normal#Robots:%%#RobotsHighlight#%d%%#Normal#/%%#RobotsHighlight#%d ' .
                 \ '%%#Normal#Shield:%s%d%%%% ' .
                 \ '%%#Normal#Level:%%#RobotsHighlight#%d  ' .
-                \ '%%#RobotsPortals3#%s' .
+                \ '%s%s' .
                 \ '%%=%%#RobotsHighlight#?%%#Normal#:Help',
                 \ s:score,
                 \ len(s:robotsPos), s:RobotCount(),
                 \ (s:shield<s:shieldFull?'%#RobotsRiskyTransport#':'%#RobotsSafeTransport#'),
                 \ 100*s:shield/s:shieldFull, s:level,
+                \ s:level < s:levelPortalsAllowRobots ? '%#RobotsPortals2#' : '%#RobotsPortals3#',
                 \ s:level < s:levelPortalsOn ? '' :
                     \ s:level < s:levelPortalsAllowRobots ? 'Portals are active.' : 'Watch out! Robots can use portals now.')
 endfunction

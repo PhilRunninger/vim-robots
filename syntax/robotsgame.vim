@@ -21,7 +21,7 @@ highlight RobotsPlayerDeath3    cterm=bold ctermfg=196 guifg=#ff0000
 highlight RobotsGameOver        cterm=bold ctermfg=196 guifg=#ff0000
 highlight RobotsPortals1        cterm=bold ctermfg=25  guifg=#0087ff
 highlight RobotsPortals2        cterm=bold ctermfg=45  guifg=#00d7ff
-highlight RobotsPortals3        cterm=bold ctermfg=39  guifg=#00afff
+highlight RobotsPortals3        cterm=bold ctermfg=196 guifg=#ff0000
 highlight RobotsTeleportTarget1 cterm=bold ctermfg=214 guifg=#ffaf00
 highlight RobotsTeleportTarget2 cterm=bold ctermfg=209 guifg=#ff875f
 highlight RobotsTeleportTarget3 cterm=bold ctermfg=221 guifg=#ffd75f
