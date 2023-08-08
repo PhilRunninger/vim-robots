@@ -25,10 +25,10 @@ function! s:InitAndStartRobots()   "{{{1
     let s:LEFT = 8
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
-    setlocal statusline=%{%RobotsStatusline()%}
     setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn
     let s:hlsearch = &hlsearch  " Remember the setting so it can be restored.
     set nohlsearch              " 'hlsearch' is a global setting
+    call s:SetStatusline(v:true)
 
     for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
         for key in keys
@@ -41,14 +41,20 @@ function! s:InitAndStartRobots()   "{{{1
     nnoremap <buffer> <silent> w :call <SID>WaitOneTurn()<CR>
     nnoremap <buffer> <silent> t :call <SID>Transport()<CR>
     nnoremap <buffer> <silent> F :call <SID>FinishLevel()<CR>
-    nnoremap <buffer> <silent> ? :call <SID>ShowKeys()<CR>
+    nnoremap <buffer> <silent> ? :call <SID>SetStatusline(v:true)<CR>
     nnoremap <buffer> <silent> <Esc> :tabprevious<CR>
 
     call s:StartNewGame()
 endfunction
 
+function! s:SetStatusline(showKeys = v:false) " or refresh it on demand  {{{1
+    let s:showKeys = a:showKeys
+    setlocal statusline=%{%RobotsStatusline()%}
+endfunction
+
 function! RobotsStatusline()   "{{{1
-    if exists('s:showKeys')
+    if s:showKeys
+        let s:showKeys = v:false
         return printf('%%=%%#RobotsPlayer#%s%%#Normal#:you ' .
                     \ '%%#RobotsRobot#%s%%#Normal#:robot ' .
                     \ '%%#RobotsJunkPile#%s%%#Normal#:junk pile '.
@@ -76,15 +82,12 @@ function! RobotsStatusline()   "{{{1
                     \ s:level < s:levelPortalsAllowRobots ? 'Portals are active.' : 'Watch out! Robots can use portals now.')
 endfunction
 
-function! s:ShowKeys()   "{{{1
-    let s:showKeys = 'I Exist!'
-endfunction
-
 function! s:StartNewGame()   "{{{1
     let s:score = 0
     let s:level = 0
     let s:shield = 0
     call s:StartNewLevel()
+    call s:SetStatusline(v:true)
 endfunction
 
 function! s:StartNewLevel()   "{{{1
@@ -250,7 +253,6 @@ function! s:WaitOneTurn()   "{{{1
 endfunction
 
 function! s:Transport()   "{{{1
-    unlet! s:showKeys
     let l:startPt = s:ToScreenPosition(s:playerPos)
     call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), ['✹✶✵'], s:Empty(s:playerPos), [' '])
     let s:playerPos = s:RandomPosition()
@@ -311,7 +313,7 @@ function! s:FinishLevel()   "{{{1
     while !s:PlayerWinsLevel() && !s:GameOver()
         call s:MoveRobots()
         redraw
-        setlocal statusline=%{%RobotsStatusline()%}
+        call s:SetStatusline()
         sleep 25m
     endwhile
     call s:Continue()
@@ -358,7 +360,6 @@ function! s:Sign(num)   "{{{1
 endfunction
 
 function! s:MoveRobots()   "{{{1
-    unlet! s:showKeys
     let newRobotPos = []
     for robot in s:robotsPos
         let deltaRow = s:playerPos[0] == robot[0] ? 2*Random(2)-1 : s:playerPos[0] - robot[0]
