@@ -3,14 +3,12 @@ execute 'syntax match RobotsPlayer /'.g:robots_player.'/'
 execute 'syntax match RobotsJunkPile /'.g:robots_junk_pile.'/'
 execute 'syntax match RobotsEmpty /'.g:robots_empty.'/'
 execute 'syntax match RobotsPortals1 /'.g:robots_portal.'/'
-execute 'syntax match RobotsPortals2 /[│⎺⎽]/'
+execute 'syntax match RobotsPortals2 /[-│]/'
 execute 'syntax match RobotsGameOver /'.g:robots_game_over.'/'
-syntax match RobotsTeleportTarget1 /✹/
-syntax match RobotsTeleportTarget2 /✵/
-syntax match RobotsTeleportTarget3 /✶/
-syntax match RobotsPlayerDeath1 /×/
-syntax match RobotsPlayerDeath2 /x/
-syntax match RobotsPlayerDeath3 /X/
+syntax match RobotsTeleportTarget1 /[αδηκνπτχΑΔΗΚΝΠΤΧ]/
+syntax match RobotsTeleportTarget2 /[βεθλξρυψΒΕΘΛΞΡΥΨ]/
+syntax match RobotsTeleportTarget3 /[γζιμοσφωΓΖΙΜΟΣΦΩ]/
+syntax match RobotsPlayerDeath3 /█/
 
 highlight RobotsRobot           cterm=bold ctermfg=165 guifg=#d700ff
 highlight RobotsPlayer          cterm=bold ctermfg=40  guifg=#00df00

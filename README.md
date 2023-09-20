@@ -52,7 +52,7 @@ Key | | Function
 Your transporter and shield are closely linked. The transporter is used to whisk you away from imminent capture, but using it comes at a cost. Each transport reduces the shield's strength by 100%. If the shield is below 100%, you **could** transport onto a robot or junk pile, and be captured immediately. Using the <kbd>F</kbd> key to finish a level will recharge your shield at the rate of 20% for each defeated robot. There is no maximum shield strength.
 
 ## Customization
-The symbols representing various items can be changed to your liking. The statements below recreate the retro look, and the default values are shown in the comments. When portals are active, special characters are used to approximate a connected edge between them. If they don't display correctly, you can turn the border off with the `g:robots_border` variable.
+The symbols representing various items can be changed to your liking. The statements below recreate the retro look, and the default values are shown in the comments.
 
 ```vim
 let g:robots_empty = "\u00a0"  " Default: ·  An unoccupied cell on the board
@@ -60,5 +60,4 @@ let g:robots_robot = '+'       " Default: ■  A robot bent on capturing you
 let g:robots_junk_pile = '*'   " Default: ▲  A junk pile
 let g:robots_player = '@'      " Default: ●  You
 let g:robots_portal = 'o'      " Default: ⊙  A portal you can (maybe) use to escape
-let g:robots_border = 0        " Default: 1  Draw (or not) lines between portals
 ```
