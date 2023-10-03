@@ -148,18 +148,22 @@ endfunction
 
 function! s:DrawBorder()   "{{{1
     if s:PortalsAreOpen(s:TOP)
-        execute 'silent 1s/'  .g:robots_portal.'  /'.g:robots_portal.'--/ge'
-        execute 'silent 1s/  '.g:robots_portal.'/--'.g:robots_portal.'/ge'
+        execute "silent 1s/".     g:robots_portal." " ."/".     g:robots_portal."." ."/ge"
+        execute "silent 1s/". " ".g:robots_portal     ."/". ".".g:robots_portal     ."/ge"
+        execute "silent 2s/".     g:robots_portal." " ."/".     g:robots_portal."'" ."/ge"
+        execute "silent 2s/". " ".g:robots_portal     ."/". "'".g:robots_portal     ."/ge"
     endif
     if s:PortalsAreOpen(s:BOTTOM)
-        execute 'silent $s/'  .g:robots_portal.'  /' .g:robots_portal.'--/ge'
-        execute 'silent $s/  '.g:robots_portal.'/--'.g:robots_portal.'/ge'
+        execute "silent $-1s/".     g:robots_portal." " ."/".     g:robots_portal."." ."/ge"
+        execute "silent $-1s/". " ".g:robots_portal     ."/". ".".g:robots_portal     ."/ge"
+        execute "silent   $s/".     g:robots_portal." " ."/".     g:robots_portal."'" ."/ge"
+        execute "silent   $s/". " ".g:robots_portal     ."/". "'".g:robots_portal     ."/ge"
     endif
     if s:PortalsAreOpen(s:LEFT)
-        execute 'silent 2,$-1s/^ /│/e'
+        execute 'silent 2,$-1s/^ /|/e'
     endif
     if s:PortalsAreOpen(s:RIGHT)
-        execute 'silent 2,$-1s/ $/│/e'
+        execute 'silent 2,$-1s/ $/|/e'
     endif
 endfunction
 
