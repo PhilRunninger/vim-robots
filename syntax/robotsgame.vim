@@ -3,12 +3,12 @@ execute 'syntax match RobotsPlayer /'.g:robots_player.'/'
 execute 'syntax match RobotsJunkPile /'.g:robots_junk_pile.'/'
 execute 'syntax match RobotsEmpty /'.g:robots_empty.'/'
 execute 'syntax match RobotsPortals1 /'.g:robots_portal.'/'
-execute "syntax match RobotsPortals2 /[.'|]/"
-execute 'syntax match RobotsGameOver /'.g:robots_game_over.'/'
+execute "syntax match RobotsBorder /[.'|]/"
+syntax match RobotsGameOver /\(GAME OVER\|Play Again?\)/
 syntax match RobotsTeleportTarget1 /[αδηκνπτχΑΔΗΚΝΠΤΧ]/
 syntax match RobotsTeleportTarget2 /[βεθλξρυψΒΕΘΛΞΡΥΨ]/
 syntax match RobotsTeleportTarget3 /[γζιμοσφωΓΖΙΜΟΣΦΩ]/
-syntax match RobotsPlayerDeath3 /█/
+syntax match RobotsPlayerDeath3 /╳/
 
 highlight RobotsRobot           cterm=bold ctermfg=165 guifg=#d700ff
 highlight RobotsPlayer          cterm=bold ctermfg=40  guifg=#00df00
@@ -29,7 +29,9 @@ highlight RobotsTitle           cterm=bold ctermfg=214 guifg=#ffaf00
 highlight RobotsHighlight       cterm=bold ctermfg=172 guifg=#df8700
 
 if &background == 'dark'
-    highlight RobotsEmpty       cterm=bold ctermfg=242 guifg=#666666
+    highlight RobotsEmpty       cterm=bold ctermfg=243 guifg=#767676
+    highlight RobotsBorder      cterm=bold ctermfg=269 guifg=#4e4e4e
 else
-    highlight RobotsEmpty       cterm=bold ctermfg=250 guifg=#bcbcbc
+    highlight RobotsEmpty       cterm=bold ctermfg=249 guifg=#b2b2b2
+    highlight RobotsBorder      cterm=bold ctermfg=253 guifg=#dadada
 endif

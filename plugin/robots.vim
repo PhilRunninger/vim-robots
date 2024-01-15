@@ -8,7 +8,6 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player',    '●')
     let g:robots_portal    = get(g:, 'robots_portal',    '⊙')
-    let g:robots_game_over = 'GAME OVER    Play again?'
 
     tabnew
     let s:levelPortalsOn = 6
@@ -24,7 +23,7 @@ function! s:InitAndStartRobots()   "{{{1
     let s:LEFT = 8
 
     setlocal filetype=robotsgame buftype=nofile bufhidden=wipe
-    setlocal nonumber signcolumn=no nolist nocursorline nocursorcolumn
+    setlocal nonumber norelativenumber signcolumn=no nolist nocursorline nocursorcolumn
     let s:hlsearch = &hlsearch  " Remember the setting so it can be restored.
     set nohlsearch              " 'hlsearch' is a global setting
     call s:SetStatusline(v:true)
@@ -101,7 +100,7 @@ function! s:StartNewLevel()   "{{{1
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
     call s:Bezier(l:startPt, s:ToScreenPosition(s:playerPos))
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [1], g:robots_player, [3,-1])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 1, g:robots_player, 2, 1)
     call s:DrawAll(s:robotsPos, g:robots_robot, 10)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 endfunction
@@ -147,22 +146,22 @@ function! s:DrawGrid()   "{{{1
 endfunction
 
 function! s:DrawBorder()   "{{{1
-    if s:PortalsAreOpen(s:TOP)
-        execute "silent 1s/".     g:robots_portal." " ."/".     g:robots_portal."." ."/ge"
-        execute "silent 1s/". " ".g:robots_portal     ."/". ".".g:robots_portal     ."/ge"
-        execute "silent 2s/".     g:robots_portal." " ."/".     g:robots_portal."'" ."/ge"
-        execute "silent 2s/". " ".g:robots_portal     ."/". "'".g:robots_portal     ."/ge"
+    if !s:PortalsAreOpen(s:TOP)
+        execute "silent 1s/".     g:robots_empty." " ."/".     g:robots_empty."." ."/ge"
+        execute "silent 1s/". " ".g:robots_empty     ."/". ".".g:robots_empty     ."/ge"
+        execute "silent 2s/".     g:robots_empty." " ."/".     g:robots_empty."'" ."/ge"
+        execute "silent 2s/". " ".g:robots_empty     ."/". "'".g:robots_empty     ."/ge"
     endif
-    if s:PortalsAreOpen(s:BOTTOM)
-        execute "silent $-1s/".     g:robots_portal." " ."/".     g:robots_portal."." ."/ge"
-        execute "silent $-1s/". " ".g:robots_portal     ."/". ".".g:robots_portal     ."/ge"
-        execute "silent   $s/".     g:robots_portal." " ."/".     g:robots_portal."'" ."/ge"
-        execute "silent   $s/". " ".g:robots_portal     ."/". "'".g:robots_portal     ."/ge"
+    if !s:PortalsAreOpen(s:BOTTOM)
+        execute "silent $-1s/".     g:robots_empty." " ."/".     g:robots_empty."." ."/ge"
+        execute "silent $-1s/". " ".g:robots_empty     ."/". ".".g:robots_empty     ."/ge"
+        execute "silent   $s/".     g:robots_empty." " ."/".     g:robots_empty."'" ."/ge"
+        execute "silent   $s/". " ".g:robots_empty     ."/". "'".g:robots_empty     ."/ge"
     endif
-    if s:PortalsAreOpen(s:LEFT)
+    if !s:PortalsAreOpen(s:LEFT)
         execute 'silent 2,$-1s/^ /|/e'
     endif
-    if s:PortalsAreOpen(s:RIGHT)
+    if !s:PortalsAreOpen(s:RIGHT)
         execute 'silent 2,$-1s/ $/|/e'
     endif
 endfunction
@@ -254,7 +253,7 @@ endfunction
 
 function! s:Transport()   "{{{1
     let l:startPt = s:ToScreenPosition(s:playerPos)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [3], s:Empty(s:playerPos), [-1])
+    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 2, s:Empty(s:playerPos), 1, 1)
     let s:playerPos = s:RandomPosition()
     if s:shield >= s:shieldFull
         while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
@@ -267,38 +266,45 @@ function! s:Transport()   "{{{1
     let l:endPt = s:ToScreenPosition(s:playerPos)
     call s:Bezier(l:startPt, l:endPt)
 
-    if s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], '█', [2])
-    else
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [1], g:robots_player, [3,-1])
+    if !s:GameOver()
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 1, g:robots_player, 2, 1)
     endif
     call s:UpdateScore(0)
     call s:Continue()
 endfunction
 
 function! s:Bezier(startPt, endPt)   "{{{1
-    let l:count = 50
-    let l:ctl = [a:startPt, [1+Random(s:height), 1+Random(s:width)], [1+Random(s:height), 1+Random(s:width)], a:endPt]
-    let l:bezier = []
-    for t in range(0,l:count)
-        let t = 1.0*t/l:count
-        call add(l:bezier,
-                    \ [float2nr(round(pow(1-t,3.0)*l:ctl[0][0] + 3.0*pow(1-t,2.0)*t*l:ctl[1][0] + 3.0*(1-t)*pow(t,2.0)*l:ctl[2][0] + pow(t,3.0)*l:ctl[3][0])),
-                    \  float2nr(round(pow(1-t,3.0)*l:ctl[0][1] + 3.0*pow(1-t,2.0)*t*l:ctl[1][1] + 3.0*(1-t)*pow(t,2.0)*l:ctl[2][1] + pow(t,3.0)*l:ctl[3][1]))])
-        if t>0 && l:bezier[-1] == l:bezier[-2]  " Remove consecutive duplicates.
-            call remove(l:bezier,-1)
+    let n = Random(10)+3    " number of control points
+    let pascal = [1.0]      " (n-1)th row of Pascal's triangle
+    for i in range(n-1)
+        call add(pascal, pascal[i] * 1.0 * (n-1-i)/(i+1))
+    endfor
+    let ctlPts = [a:startPt] + map(range(n-2), {_ -> [1+Random(s:height), 1+Random(s:width)]}) + [a:endPt]
+
+    let m = 50              " number of Bezier points
+    let bezier = []         " list of generated points
+    for t in range(0,m)
+        let t = 1.0*t/m     " percent of the way along the path
+        let [r,c] = [0,0]
+        for i in range(n)   " Bezier points are weighted average of control points (requires pow(0,0)=1)
+            let weight = pascal[i] * pow(t,i) * pow(1-t, n-1-i)
+            let [r,c] = [r + weight * ctlPts[i][0], c + weight * ctlPts[i][1]]
+        endfor
+        call add(bezier, [float2nr(round(r)), float2nr(round(c))])
+        if t>0 && bezier[-1] == bezier[-2]  " Remove consecutive duplicates.
+            call remove(bezier,-1)
         endif
     endfor
 
-    let old_chars = map(copy(l:bezier), {_,v -> strcharpart(getline(v[0]), v[1]-1, 1)})
+    let old_chars = map(copy(bezier), {_,v -> strcharpart(getline(v[0]), v[1]-1, 1)})
     let i = 0
-    let j = -len(l:bezier)/2
-    while i < len(l:bezier) || j < len(l:bezier)
-        if i >= 0 && i < len(l:bezier)
-            call s:DrawAt(l:bezier[i], s:RandomChar())
+    let j = -len(bezier)/2
+    while i < len(bezier) || j < len(bezier)
+        if i >= 0 && i < len(bezier)
+            call s:DrawAt(bezier[i], s:RandomChar())
         endif
-        if j >= 0 && j < len(l:bezier)
-            call s:DrawAt(l:bezier[j], old_chars[j])
+        if j >= 0 && j < len(bezier)
+            call s:DrawAt(bezier[j], old_chars[j])
         endif
         redraw
         sleep 1m
@@ -319,25 +325,26 @@ function! s:FinishLevel()   "{{{1
     call s:Continue()
 endfunction
 
-function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff)   "{{{1
+function! s:DrawTransporterBeam(cell, beamOn, transportee, beamOff, clear)   "{{{1
     let cells = map([[-1,-1],[-1,0],[-1,1],[0,2],[1,1],[1,0],[1,-1],[0,-2]], {_,val -> [val[0]+a:cell[0], val[1]+a:cell[1]]})
     let old_chars = map(copy(cells), {_,v -> strcharpart(getline(v[0]), v[1]-1, 1)})
-    for sparkles in [a:beamOn, a:beamOff]
-        for sparkle in sparkles
-            let random = map(range(8*abs(sparkle)), {_ -> Random(1000000)})
-            for _ in random
-                let max = index(random, max(random))
-                let [r,c] = cells[max % 8]
-                let random[max] = -1
-                if r > 0 && r <= line('$') && c > 0 && c <= strchars(getline(r))
-                    let idx = index(cells,[r,c])
-                    call s:DrawAt([r,c], sparkle < 0 ? old_chars[idx] : s:RandomChar())
-                endif
-                redraw
-                sleep 1m
-            endfor
-        endfor
-        call s:DrawAt(a:cell, a:transportee)
+    call map(range(a:beamOn), {_ -> s:DrawSparkles(cells)})
+    call s:DrawAt(a:cell, a:transportee)
+    call map(range(a:beamOff), {_ -> s:DrawSparkles(cells)})
+    if a:clear
+        call s:DrawSparkles(cells, old_chars)
+    endif
+endfunction
+
+function! s:DrawSparkles(cells, sparkles=[])
+    let random = map(range(8), {_ -> Random(1000000)})
+    for _ in random
+        let i = index(random, max(random))
+        let [r,c] = a:cells[i]
+        if r > 0 && r <= line('$') && c > 0 && c <= strchars(getline(r))
+            call s:DrawAt([r,c], empty(a:sparkles) ? s:RandomChar(): a:sparkles[i] )
+        endif
+        let random[i] = -1
         redraw
         sleep 1m
     endfor
@@ -429,22 +436,23 @@ endfunction
 
 function! s:Continue()   "{{{1
     if s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [], '█', [2])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 0, '╳', 0, 0)
         call s:PlayAnother()
     elseif s:PlayerWinsLevel()
         call s:DrawAll(s:junkPilesPos, g:robots_empty, 25)
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [3], s:Empty(s:playerPos), [-1])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 2, s:Empty(s:playerPos), 0, 1)
         call s:StartNewLevel()
     endif
 endfunction
 
 function! s:PlayAnother()   "{{{1
     setlocal modifiable
-    call s:DrawAt([s:rows/2,(s:width-strchars(g:robots_game_over))/2], g:robots_game_over)
+    call s:DrawAt([s:rows/2-1,(s:width-strchars('GAME OVER'))/2], 'GAME OVER')
+    call s:DrawAt([s:rows/2+1,(s:width-strchars('Play Again?'))/2], 'Play Again?')
     setlocal nomodifiable
     redraw!
     if nr2char(getchar()) ==? 'y'
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), [3], s:Empty(s:playerPos), [-1])
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 2, s:Empty(s:playerPos), 1, 1)
         call s:StartNewGame()
     else
         let &hlsearch = s:hlsearch
