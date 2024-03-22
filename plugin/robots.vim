@@ -7,8 +7,10 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_robot     = get(g:, 'robots_robot',     '■')
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player',    '●')
+    let g:robots_capture   = get(g:, 'robots_capture',   '🕱')
     let g:robots_portal    = get(g:, 'robots_portal',    '⊙')
     let g:robots_animation = get(g:, 'robots_animation', 1)
+    let g:robots_sparkles  = '⠋⠍⠎⠏⠓⠕⠖⠗⠙⠚⠛⠜⠝⠞⠟⠣⠥⠦⠧⠩⠪⠫⠬⠭⠮⠯⠱⠲⠳⠴⠵⠶⠷⠹⠺⠻⠼⠽⠾⡉⡊⡋⡍⡎⡏⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡰⡱⡲⡳⡴⡵⡶⡸⡹⡺⡼⢃⢅⢆⢇⢉⢊⢋⢌⢍⢎⢏⢑⢒⢓⢔⢕⢖⢗⢙⢚⢛⢜⢝⢞⢡⢢⢣⢤⢥⢦⢧⢩⢪⢫⢬⢭⢮⢱⢲⢳⢴⢵⢶⣁⣂⣃⣄⣅⣆⣈⣉⣊⣋⣌⣍⣎⣐⣑⣒⣓⣔⣕⣖⣘⣙⣚⣜⣠⣡⣢⣣⣤⣥⣦⣨⣩⣪⣬⣰⣱⣲⣳⣴'
 
     tabnew
     let s:levelPortalsOn = 6
@@ -54,14 +56,14 @@ endfunction
 function! RobotsStatusline()   "{{{1
     if s:showKeys
         let s:showKeys = v:false
-        return printf('%%=%%#RobotsPlayer#%s%%#Normal#:you ' .
-                    \ '%%#RobotsRobot#%s%%#Normal#:robot ' .
-                    \ '%%#RobotsJunkPile#%s%%#Normal#:junk pile '.
-                    \ '%%#RobotsPortals1#%s%%#Normal#:portal  ' .
-                    \ '%%#RobotsHighlight#yujkbn%%#Normal#:Move ' .
-                    \ '%%#RobotsHighlight#w%%#Normal#:Wait ' .
-                    \ '%%#RobotsHighlight#t%%#Normal#:Transport ' .
-                    \ '%%#RobotsHighlight#F%%#Normal#:Finish%%=',
+        return printf('%%=%%#Normal#you:%%#RobotsPlayer#%s ' .
+                    \ '%%#Normal#robot:%%#RobotsRobot#%s ' .
+                    \ '%%#Normal#junk pile:%%#RobotsJunkPile#%s '.
+                    \ '%%#Normal#portal:%%#RobotsPortals#%s  ' .
+                    \ '%%#Normal#Move:%%#RobotsHighlight#yujkbn ' .
+                    \ '%%#Normal#Wait:%%#RobotsHighlight#w ' .
+                    \ '%%#Normal#Transport:%%#RobotsHighlight#t ' .
+                    \ '%%#Normal#Finish:%%#RobotsHighlight#F%%=',
                     \ g:robots_player,
                     \ g:robots_robot,
                     \ g:robots_junk_pile,
@@ -77,7 +79,7 @@ function! RobotsStatusline()   "{{{1
                 \ len(s:robotsPos), s:RobotCount(),
                 \ (s:shield<s:shieldFull?'%#RobotsRiskyTransport#':'%#RobotsSafeTransport#'),
                 \ 100*s:shield/s:shieldFull, s:level,
-                \ s:level < s:levelPortalsAllowRobots ? '%#RobotsPortals2#' : '%#RobotsPortals3#',
+                \ s:level < s:levelPortalsAllowRobots ? '%#RobotsPortalsMsg1#' : '%#RobotsPortalsMsg2#',
                 \ s:level < s:levelPortalsOn ? '' :
                     \ s:level < s:levelPortalsAllowRobots ? 'Portals are active.' : 'Watch out! Robots can use portals now.')
 endfunction
@@ -217,8 +219,8 @@ function! s:RandomPosition()   "{{{1
     return [r,c]
 endfunction
 
-function! s:RandomChar()   "{{{1
-    return strcharpart('αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ', Random(48), 1)
+function! s:RandomSparkle()   "{{{1
+    return strcharpart(g:robots_sparkles, Random(strchars(g:robots_sparkles)), 1)
 endfunction
 
 function! s:ToScreenPosition(position)   "{{{1
@@ -286,7 +288,7 @@ function! s:Bezier(startPt, endPt)   "{{{1
     endfor
     let ctlPts = [a:startPt] + map(range(n-2), {_ -> [1+Random(s:height), 1+Random(s:width)]}) + [a:endPt]
 
-    let m = 50              " number of Bezier points
+    let m = 100             " number of Bezier points
     let bezier = []         " list of generated points
     for t in range(0,m)
         let t = 1.0*t/m     " percent of the way along the path
@@ -306,7 +308,7 @@ function! s:Bezier(startPt, endPt)   "{{{1
     let j = -len(bezier)/2
     while i < len(bezier) || j < len(bezier)
         if i >= 0 && i < len(bezier)
-            call s:DrawAt(bezier[i], s:RandomChar())
+            call s:DrawAt(bezier[i], s:RandomSparkle())
         endif
         if j >= 0 && j < len(bezier)
             call s:DrawAt(bezier[j], old_chars[j])
@@ -347,7 +349,7 @@ function! s:DrawSparkles(cells, sparkles=[])
         let i = index(random, max(random))
         let [r,c] = a:cells[i]
         if r > 0 && r <= line('$') && c > 0 && c <= strchars(getline(r))
-            call s:DrawAt([r,c], empty(a:sparkles) ? s:RandomChar(): a:sparkles[i] )
+            call s:DrawAt([r,c], empty(a:sparkles) ? s:RandomSparkle(): a:sparkles[i] )
         endif
         let random[i] = -1
         redraw
@@ -441,7 +443,7 @@ endfunction
 
 function! s:Continue()   "{{{1
     if s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 0, '╳', 0, 0)
+        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 0, g:robots_capture, 0, 0)
         call s:PlayAnother()
     elseif s:PlayerWinsLevel()
         call s:DrawAll(s:junkPilesPos, g:robots_empty, 25)
