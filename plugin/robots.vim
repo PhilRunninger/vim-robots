@@ -8,6 +8,7 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player',    '●')
     let g:robots_portal    = get(g:, 'robots_portal',    '⊙')
+    let g:robots_animation = get(g:, 'robots_animation', 1)
 
     tabnew
     let s:levelPortalsOn = 6
@@ -274,6 +275,10 @@ function! s:Transport()   "{{{1
 endfunction
 
 function! s:Bezier(startPt, endPt)   "{{{1
+    if !g:robots_animation
+        return
+    endif
+
     let n = Random(10)+3    " number of control points
     let pascal = [1.0]      " (n-1)th row of Pascal's triangle
     for i in range(n-1)

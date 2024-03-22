@@ -44,7 +44,7 @@ Key | | Function
 :-:|---|---
 <kbd>t</kbd>   | Transport | If you become trapped, you can transport to another location.
 <kbd>w</kbd>   | Wait      | Sometimes the only winning move is not to play, but to wait and let the robots advance one step.
-<kbd>F</kbd>   | Finish    | Finishing the level means waiting until defeat or triumph. Earn double the points and recharge your shield.
+<kbd>F</kbd>   | Finish    | Finishing the level means waiting in place until defeat or triumph. Earn double the points and recharge your shield.
 <kbd>?</kbd>   | Help      | Toggles the statusline to show the symbol legend and key mappings. The next move resets the statusline.
 <kbd>Esc</kbd> | Boss Key  | What? You've never heard of this?
 
@@ -60,4 +60,10 @@ let g:robots_robot = '+'       " Default: ■  A robot bent on capturing you
 let g:robots_junk_pile = '*'   " Default: ▲  A junk pile
 let g:robots_player = '@'      " Default: ●  You
 let g:robots_portal = 'o'      " Default: ⊙  A portal you can (maybe) use to escape
+```
+
+When transporting, a meandering path is drawn from the starting location to the final destination. It's just a bit of hi-res eye candy, and it can be slow on some computers. To turn it off, use this statement:
+
+```vim
+let g:robots_animation = 0
 ```
