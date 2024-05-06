@@ -8,7 +8,7 @@ function! s:InitAndStartRobots()   "{{{1
     let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
     let g:robots_player    = get(g:, 'robots_player',    '●')
     let g:robots_capture   = get(g:, 'robots_capture',   '🕱')
-    let g:robots_portal    = get(g:, 'robots_portal',    '⊙')
+    let g:robots_portal    = get(g:, 'robots_portal',    '⬡')
     let g:robots_animation = get(g:, 'robots_animation', 1)
     let g:robots_sparkles  = '⠋⠍⠎⠏⠓⠕⠖⠗⠙⠚⠛⠜⠝⠞⠟⠣⠥⠦⠧⠩⠪⠫⠬⠭⠮⠯⠱⠲⠳⠴⠵⠶⠷⠹⠺⠻⠼⠽⠾⡉⡊⡋⡍⡎⡏⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡰⡱⡲⡳⡴⡵⡶⡸⡹⡺⡼⢃⢅⢆⢇⢉⢊⢋⢌⢍⢎⢏⢑⢒⢓⢔⢕⢖⢗⢙⢚⢛⢜⢝⢞⢡⢢⢣⢤⢥⢦⢧⢩⢪⢫⢬⢭⢮⢱⢲⢳⢴⢵⢶⣁⣂⣃⣄⣅⣆⣈⣉⣊⣋⣌⣍⣎⣐⣑⣒⣓⣔⣕⣖⣘⣙⣚⣜⣠⣡⣢⣣⣤⣥⣦⣨⣩⣪⣬⣰⣱⣲⣳⣴'
 
@@ -131,42 +131,20 @@ endfunction
 
 function! s:DrawGrid()   "{{{1
     setlocal modifiable
-    normal! ggdG
+    silent normal! ggdG
     for r in range(1,s:rows,1)
         call append(0, (r%2 ? '':'   ').trim(repeat(g:robots_empty.'     ',s:cols/2), ' ').(r%2 ? '   ':''))
     endfor
 
-    execute 'g/^$/d'
+    silent g/^$/d
     if s:PortalsAreOpen(s:TOP)    | execute 'silent 1,2s/' .g:robots_empty.'/'.g:robots_portal.'/ge'   | endif
     if s:PortalsAreOpen(s:BOTTOM) | execute 'silent $-1,$s/'.g:robots_empty. '/'.g:robots_portal.'/ge' | endif
     if s:PortalsAreOpen(s:LEFT)   | execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'    | endif
     if s:PortalsAreOpen(s:RIGHT)  | execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'    | endif
-    call s:DrawBorder()
 
     call s:UpdateScore(0)
     normal! gg0
     setlocal nomodifiable
-endfunction
-
-function! s:DrawBorder()   "{{{1
-    if !s:PortalsAreOpen(s:TOP)
-        execute "silent 1s/".     g:robots_empty." " ."/".     g:robots_empty."." ."/ge"
-        execute "silent 1s/". " ".g:robots_empty     ."/". ".".g:robots_empty     ."/ge"
-        execute "silent 2s/".     g:robots_empty." " ."/".     g:robots_empty."'" ."/ge"
-        execute "silent 2s/". " ".g:robots_empty     ."/". "'".g:robots_empty     ."/ge"
-    endif
-    if !s:PortalsAreOpen(s:BOTTOM)
-        execute "silent $-1s/".     g:robots_empty." " ."/".     g:robots_empty."." ."/ge"
-        execute "silent $-1s/". " ".g:robots_empty     ."/". ".".g:robots_empty     ."/ge"
-        execute "silent   $s/".     g:robots_empty." " ."/".     g:robots_empty."'" ."/ge"
-        execute "silent   $s/". " ".g:robots_empty     ."/". "'".g:robots_empty     ."/ge"
-    endif
-    if !s:PortalsAreOpen(s:LEFT)
-        execute 'silent 2,$-1s/^ /|/e'
-    endif
-    if !s:PortalsAreOpen(s:RIGHT)
-        execute 'silent 2,$-1s/ $/|/e'
-    endif
 endfunction
 
 function! s:PortalsAreOpen(direction, forWhom = 'player')   "{{{1
