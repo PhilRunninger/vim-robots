@@ -154,6 +154,10 @@ function! s:PortalsAreOpen(direction, forWhom = 'player')   "{{{1
 endfunction
 
 function! s:Empty(position)   "{{{1
+    if count(s:junkPilesPos, a:position) > 0
+        return g:robots_junk_pile
+    endif
+
     let [r,c] = a:position
     if (r < 2 && s:PortalsAreOpen(s:TOP)) ||
      \ (r >= s:rows-2 && s:PortalsAreOpen(s:BOTTOM)) ||
