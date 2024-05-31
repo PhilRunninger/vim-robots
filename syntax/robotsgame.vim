@@ -5,6 +5,7 @@ execute printf('syntax match RobotsJunkPile /%s/',      g:robots_junk_pile)
 execute printf('syntax match RobotsEmpty /%s/',         g:robots_empty)
 execute printf('syntax match RobotsSafePortals /%s/',   g:robots_safe_portals)
 execute printf('syntax match RobotsRiskyPortals /%s/',  g:robots_risky_portals)
+execute printf("syntax match RobotsDecoy /[-.'|0-9]/")
 execute printf('syntax match RobotsGameOver /\(GAME OVER\|Play Again?\)/')
 
 let s:color_count = 40
@@ -20,6 +21,7 @@ endfor
 
 highlight RobotsRobot           cterm=bold ctermfg=165 gui=bold guifg=#d700ff
 highlight RobotsPlayer          cterm=bold ctermfg=40  gui=bold guifg=#00df00
+highlight RobotsDecoy           cterm=bold ctermfg=28  gui=bold guifg=#008700
 highlight RobotsJunkPile        cterm=bold ctermfg=208 gui=bold guifg=#ff8700
 highlight RobotsPlayerCapture   cterm=bold ctermfg=196 gui=bold guifg=#ff0000
 highlight RobotsGameOver        cterm=bold ctermfg=196 gui=bold guifg=#ff0000

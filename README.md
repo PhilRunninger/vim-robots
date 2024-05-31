@@ -43,6 +43,7 @@ Main Keyboard | Number Keypad | Direction
 Key | | Function
 :-:|---|---
 <kbd>t</kbd>   | Transport | If you become trapped, you can transport to another location.
+<kbd>d</kbd>   | Decoy     | Place a decoy down at your current location.
 <kbd>w</kbd>   | Wait      | Sometimes the only winning move is not to play, but to wait and let the robots advance one step.
 <kbd>F</kbd>   | Finish    | Finishing the level means waiting in place until defeat or triumph. Earn double the points and recharge your shield.
 <kbd>?</kbd>   | Help      | Toggles the statusline to show the symbol legend and key mappings. The next move resets the statusline.
@@ -51,14 +52,17 @@ Key | | Function
 ### Transporter and Shield
 Your transporter and shield are closely linked. The transporter is used to whisk you away from imminent capture, but using it comes at a cost. Each transport reduces the shield's strength by 100%. If the shield is below 100%, you **could** transport onto a robot or junk pile, and be captured immediately. Using the <kbd>F</kbd> key to finish a level will recharge your shield at the rate of 20% for each defeated robot. There is no maximum shield strength.
 
+### Decoy
+Once per level, you can deploy a decoy with the <kbd>d</kbd> key, which can help you escape encroaching robots. They will move toward the decoy, allowing you to briefly move without being followed. The duration of the decoy is a function of your shield strength, and doesn't drain your shield. It is always better to use the decoy as a first option.
+
 ## Customization
 The symbols representing various items can be changed to your liking. The statements below recreate the retro look, and the default values are shown in the comments.
 
 ```vim
-let g:robots_empty = "\u00a0"  " Default: ·  An unoccupied cell on the board
-let g:robots_robot = '+'       " Default: ■  A robot bent on capturing you
-let g:robots_junk_pile = '*'   " Default: ▲  A junk pile
-let g:robots_player = '@'      " Default: ●  You
+let g:robots_empty = "\u00a0"    " Default: ·  An unoccupied cell on the board
+let g:robots_robot = '+'         " Default: ■  A robot bent on capturing you
+let g:robots_junk_pile = '*'     " Default: ▲  A junk pile
+let g:robots_player = '@'        " Default: ●  You
 " The following settings have no counterpart in the original game.
 let g:robots_safe_portals  = 'o' " Default: ⬡ A portal only you can use
 let g:robots_risky_portals = '#' " Default: ⬢ A portal you and robots can use

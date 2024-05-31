@@ -40,10 +40,11 @@ function! s:InitAndStartRobots()   "{{{1
     nnoremap <buffer> <silent> 4 <nop>
     nnoremap <buffer> <silent> 5 <nop>
     nnoremap <buffer> <silent> 6 <nop>
-    nnoremap <buffer> <silent> w :call <SID>WaitOneTurn()<CR>
-    nnoremap <buffer> <silent> t :call <SID>Transport()<CR>
-    nnoremap <buffer> <silent> F :call <SID>FinishLevel()<CR>
-    nnoremap <buffer> <silent> ? :call <SID>SetStatusline(v:true)<CR>
+    nnoremap <buffer> <silent> <nowait> w :call <SID>WaitOneTurn()<CR>
+    nnoremap <buffer> <silent> <nowait> t :call <SID>Transport()<CR>
+    nnoremap <buffer> <silent> <nowait> d :call <SID>DeployDecoy()<CR>
+    nnoremap <buffer> <silent> <nowait> F :call <SID>FinishLevel()<CR>
+    nnoremap <buffer> <silent> <nowait> ? :call <SID>SetStatusline(v:true)<CR>
     nnoremap <buffer> <silent> <Esc> :tabprevious<CR>
 
     call s:StartNewGame()
@@ -64,6 +65,7 @@ function! RobotsStatusline()   "{{{1
                     \ '%%#Normal#Move:%%#RobotsHighlight#yujkbn ' .
                     \ '%%#Normal#Wait:%%#RobotsHighlight#w ' .
                     \ '%%#Normal#Transport:%%#RobotsHighlight#t ' .
+                    \ '%%#Normal#Decoy:%%#RobotsHighlight#d ' .
                     \ '%%#Normal#Finish:%%#RobotsHighlight#F%%=',
                     \ g:robots_player,
                     \ g:robots_robot,
@@ -74,14 +76,17 @@ function! RobotsStatusline()   "{{{1
     return printf('%%=%%#Normal#Score:%%#RobotsHighlight#%d ' .
                 \ '%%#Normal#Robots:%%#RobotsHighlight#%d%%#Normal#/%%#RobotsHighlight#%d ' .
                 \ '%%#Normal#Shield:%s%d%%%% ' .
+                \ '%%#Normal#Decoy:%%#RobotsHighlight#%d ' .
                 \ '%%#Normal#Level:%%#RobotsHighlight#%d  ' .
                 \ '%s%s' .
                 \ '%%=%%#RobotsHighlight#?%%#Normal#:Help',
                 \ s:score,
                 \ len(s:robotsPos), s:RobotCount(),
-                \ (s:shield<s:shieldFull?'%#RobotsRiskyTransport#':'%#RobotsSafeTransport#'),
-                \ 100*s:shield/s:shieldFull, s:level,
-                \ s:level < s:levelPortalsAllowRobots ? '%#RobotsPortalsMsg1#' : '%#RobotsPortalsMsg2#',
+                \ s:shield<s:shieldFull ? '%#RobotsRiskyTransport#' : '%#RobotsSafeTransport#',
+                \ 100*s:shield/s:shieldFull,
+                \ s:decoy.used ? 0 : 1,
+                \ s:level,
+                \ s:level < s:levelPortalsAllowRobots ? '%#RobotsSafePortalsMsg#' : '%#RobotsRiskyPortalsMsg#',
                 \ s:level < s:levelPortalsOn ? '' :
                     \ s:level < s:levelPortalsAllowRobots ? 'Portals are active.' : 'Watch out! Robots can use portals now.')
 endfunction
@@ -98,6 +103,8 @@ function! s:StartNewLevel()   "{{{1
     let s:level += 1
 
     let s:activePortals = s:level == s:levelPortalsOn ? 15 : Random(16)  " 4-bit number, one per direction.
+
+    let s:decoy = {'used':v:false, 'expiration':min([float2nr(floor(s:shield/s:shieldFull) + 1),10])}
 
     let s:finishingLevel = v:false
     let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
@@ -182,6 +189,10 @@ endfunction
 
 function! s:DrawAt(position, text)   "{{{1
     let [r,c] = a:position
+    if r <= 0 || r > line('$') || c <= 0 || c > strchars(getline(r))
+        return
+    endif
+
     let ln = getline(r)
     let leftStr = strcharpart(ln, 0, c-1)
     let rightStr = strcharpart(ln, c - 1 + strchars(a:text))
@@ -238,6 +249,7 @@ function! s:NewPosition(position, deltaRow, deltaCol, forWhom)   "{{{1
 endfunction
 
 function! s:WaitOneTurn()   "{{{1
+    call s:DrawAndExpireDecoy()
     call s:MoveRobots()
     call s:Continue()
 endfunction
@@ -309,9 +321,33 @@ function! s:Bezier(startPt, endPt)   "{{{1
     redraw
 endfunction
 
+function! s:DeployDecoy()   "{{{1
+    if s:decoy.used
+        return
+    endif
+    let s:decoy.used = v:true
+
+    let s:decoy.pos = s:playerPos
+    call s:DrawAndExpireDecoy()
+endfunction
+
+function! s:DrawAndExpireDecoy()   "{{{1
+    if !s:decoy.used || s:decoy.expiration < 0
+        return
+    endif
+
+    let s:decoy.expiration -= 1
+    let [row,col] = s:ToScreenPosition(s:decoy.pos)
+
+    for [dr,dc] in [[-1,-1],[-1,1],[0,-2],[0,2],[1,-1],[1,1]]
+        call s:DrawAt([row+dr,col+dc], s:decoy.expiration < 0 ? ' ' : s:decoy.expiration)
+    endfor
+endfunction
+
 function! s:FinishLevel()   "{{{1
     let s:finishingLevel = v:true
     while !s:PlayerWinsLevel() && !s:GameOver()
+        call s:DrawAndExpireDecoy()
         call s:MoveRobots()
         redraw
         call s:SetStatusline()
@@ -352,6 +388,7 @@ function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
     endif
     call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty(s:playerPos))
     let s:playerPos = newPos
+    call s:DrawAndExpireDecoy()
     call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
     call s:MoveRobots()
     call s:Continue()
@@ -363,9 +400,11 @@ endfunction
 
 function! s:MoveRobots()   "{{{1
     let newRobotPos = []
+    let target = s:decoy.used && s:decoy.expiration >= 0 ? s:decoy.pos : s:playerPos
+
     for robot in s:robotsPos
-        let deltaRow = s:playerPos[0] == robot[0] ? 2*Random(2)-1 : s:playerPos[0] - robot[0]
-        let deltaCol = s:playerPos[1] - robot[1]
+        let deltaRow = robot==target ? 0 : (target[0]==robot[0] ? 2*Random(2)-1 : target[0]-robot[0])
+        let deltaCol = robot==target ? 0 : (target[1] - robot[1])
 
         if s:PortalsAreOpen(s:TOP, 'robot') && abs(deltaRow-s:rows) < abs(deltaRow) " wrap-around going up
             let deltaRow = -1
