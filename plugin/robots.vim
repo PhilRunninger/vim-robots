@@ -3,14 +3,15 @@
 command! Robots :call <SID>InitAndStartRobots()   "{{{1
 
 function! s:InitAndStartRobots()   "{{{1
-    let g:robots_empty     = get(g:, 'robots_empty',     '·')
-    let g:robots_robot     = get(g:, 'robots_robot',     '■')
-    let g:robots_junk_pile = get(g:, 'robots_junk_pile', '▲')
-    let g:robots_player    = get(g:, 'robots_player',    '●')
-    let g:robots_capture   = get(g:, 'robots_capture',   '🕱')
-    let g:robots_portal    = get(g:, 'robots_portal',    '⬡')
-    let g:robots_animation = get(g:, 'robots_animation', 1)
-    let g:robots_sparkles  = '⠋⠍⠎⠏⠓⠕⠖⠗⠙⠚⠛⠜⠝⠞⠟⠣⠥⠦⠧⠩⠪⠫⠬⠭⠮⠯⠱⠲⠳⠴⠵⠶⠷⠹⠺⠻⠼⠽⠾⡉⡊⡋⡍⡎⡏⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡰⡱⡲⡳⡴⡵⡶⡸⡹⡺⡼⢃⢅⢆⢇⢉⢊⢋⢌⢍⢎⢏⢑⢒⢓⢔⢕⢖⢗⢙⢚⢛⢜⢝⢞⢡⢢⢣⢤⢥⢦⢧⢩⢪⢫⢬⢭⢮⢱⢲⢳⢴⢵⢶⣁⣂⣃⣄⣅⣆⣈⣉⣊⣋⣌⣍⣎⣐⣑⣒⣓⣔⣕⣖⣘⣙⣚⣜⣠⣡⣢⣣⣤⣥⣦⣨⣩⣪⣬⣰⣱⣲⣳⣴'
+    let g:robots_empty         = get(g:, 'robots_empty',         '·')
+    let g:robots_robot         = get(g:, 'robots_robot',         '■')
+    let g:robots_junk_pile     = get(g:, 'robots_junk_pile',     '▲')
+    let g:robots_player        = get(g:, 'robots_player',        '●')
+    let g:robots_capture       = get(g:, 'robots_capture',       '🕱')
+    let g:robots_safe_portals  = get(g:, 'robots_safe_portals',  '⬡')
+    let g:robots_risky_portals = get(g:, 'robots_risky_portals', '⬢')
+    let g:robots_animation     = get(g:, 'robots_animation', 1)
+    let g:robots_sparkles      = '⠋⠍⠎⠏⠓⠕⠖⠗⠙⠚⠛⠜⠝⠞⠟⠣⠥⠦⠧⠩⠪⠫⠬⠭⠮⠯⠱⠲⠳⠴⠵⠶⠷⠹⠺⠻⠼⠽⠾⡉⡊⡋⡍⡎⡏⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡰⡱⡲⡳⡴⡵⡶⡸⡹⡺⡼⢃⢅⢆⢇⢉⢊⢋⢌⢍⢎⢏⢑⢒⢓⢔⢕⢖⢗⢙⢚⢛⢜⢝⢞⢡⢢⢣⢤⢥⢦⢧⢩⢪⢫⢬⢭⢮⢱⢲⢳⢴⢵⢶⣁⣂⣃⣄⣅⣆⣈⣉⣊⣋⣌⣍⣎⣐⣑⣒⣓⣔⣕⣖⣘⣙⣚⣜⣠⣡⣢⣣⣤⣥⣦⣨⣩⣪⣬⣰⣱⣲⣳⣴'
 
     tabnew
     let s:levelPortalsOn = 6
@@ -59,7 +60,7 @@ function! RobotsStatusline()   "{{{1
         return printf('%%=%%#Normal#you:%%#RobotsPlayer#%s ' .
                     \ '%%#Normal#robot:%%#RobotsRobot#%s ' .
                     \ '%%#Normal#junk pile:%%#RobotsJunkPile#%s '.
-                    \ '%%#Normal#portal:%%#RobotsPortals#%s  ' .
+                    \ '%%#Normal#portal:%%#RobotsSafePortals#%s %%#RobotsRiskyPortals#%s ' .
                     \ '%%#Normal#Move:%%#RobotsHighlight#yujkbn ' .
                     \ '%%#Normal#Wait:%%#RobotsHighlight#w ' .
                     \ '%%#Normal#Transport:%%#RobotsHighlight#t ' .
@@ -67,7 +68,8 @@ function! RobotsStatusline()   "{{{1
                     \ g:robots_player,
                     \ g:robots_robot,
                     \ g:robots_junk_pile,
-                    \ g:robots_portal)
+                    \ g:robots_safe_portals,
+                    \ g:robots_risky_portals)
     endif
     return printf('%%=%%#Normal#Score:%%#RobotsHighlight#%d ' .
                 \ '%%#Normal#Robots:%%#RobotsHighlight#%d%%#Normal#/%%#RobotsHighlight#%d ' .
@@ -137,14 +139,18 @@ function! s:DrawGrid()   "{{{1
     endfor
 
     silent g/^$/d
-    if s:PortalsAreOpen(s:TOP)    | execute 'silent 1,2s/' .g:robots_empty.'/'.g:robots_portal.'/ge'   | endif
-    if s:PortalsAreOpen(s:BOTTOM) | execute 'silent $-1,$s/'.g:robots_empty. '/'.g:robots_portal.'/ge' | endif
-    if s:PortalsAreOpen(s:LEFT)   | execute 'silent 1,$s/^'.g:robots_empty.'/'.g:robots_portal.'/e'    | endif
-    if s:PortalsAreOpen(s:RIGHT)  | execute 'silent 1,$s/'.g:robots_empty.'$/'.g:robots_portal.'/e'    | endif
+    if s:PortalsAreOpen(s:TOP)    | execute 'silent 1,2s/' .g:robots_empty.'/'. s:Portal() .'/ge'   | endif
+    if s:PortalsAreOpen(s:BOTTOM) | execute 'silent $-1,$s/'.g:robots_empty. '/'. s:Portal() .'/ge' | endif
+    if s:PortalsAreOpen(s:LEFT)   | execute 'silent 1,$s/^'.g:robots_empty.'/'. s:Portal() .'/e'    | endif
+    if s:PortalsAreOpen(s:RIGHT)  | execute 'silent 1,$s/'.g:robots_empty.'$/'. s:Portal() .'/e'    | endif
 
     call s:UpdateScore(0)
     normal! gg0
     setlocal nomodifiable
+endfunction
+
+function! s:Portal()  "{{{1
+    return s:level < s:levelPortalsAllowRobots ? g:robots_safe_portals : g:robots_risky_portals
 endfunction
 
 function! s:PortalsAreOpen(direction, forWhom = 'player')   "{{{1
@@ -163,7 +169,7 @@ function! s:Empty(position)   "{{{1
      \ (r >= s:rows-2 && s:PortalsAreOpen(s:BOTTOM)) ||
      \ (c == 0 && s:PortalsAreOpen(s:LEFT)) ||
      \ (c == s:cols-1 && s:PortalsAreOpen(s:RIGHT))
-        return g:robots_portal
+        return s:Portal()
     endif
 
     return g:robots_empty

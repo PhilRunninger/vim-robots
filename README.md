@@ -59,7 +59,9 @@ let g:robots_empty = "\u00a0"  " Default: ·  An unoccupied cell on the board
 let g:robots_robot = '+'       " Default: ■  A robot bent on capturing you
 let g:robots_junk_pile = '*'   " Default: ▲  A junk pile
 let g:robots_player = '@'      " Default: ●  You
-let g:robots_portal = 'o'      " Default: ⬡  A portal you can (maybe) use to escape
+" The following settings have no counterpart in the original game.
+let g:robots_safe_portals  = 'o' " Default: ⬡ A portal only you can use
+let g:robots_risky_portals = '#' " Default: ⬢ A portal you and robots can use
 ```
 
 When transporting, a meandering path is drawn from the starting location to the final destination. It's just a bit of hi-res eye candy, and it can be slow on some computers. To turn it off, use this statement:
