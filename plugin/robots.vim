@@ -84,7 +84,7 @@ function! RobotsStatusline()   "{{{1
                 \ len(s:robotsPos), s:RobotCount(),
                 \ s:shield<s:shieldFull ? '%#RobotsRiskyTransport#' : '%#RobotsSafeTransport#',
                 \ 100*s:shield/s:shieldFull,
-                \ s:decoy.used ? 0 : 1,
+                \ s:decoy.used || s:shield<s:shieldFull ? 0 : 1,
                 \ s:level,
                 \ s:level < s:levelPortalsAllowRobots ? '%#RobotsSafePortalsMsg#' : '%#RobotsRiskyPortalsMsg#',
                 \ s:level < s:levelPortalsOn ? '' :
@@ -322,7 +322,7 @@ function! s:Bezier(startPt, endPt)   "{{{1
 endfunction
 
 function! s:DeployDecoy()   "{{{1
-    if s:decoy.used
+    if s:decoy.used || s:shield<s:shieldFull
         return
     endif
     let s:decoy.used = v:true
