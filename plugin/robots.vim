@@ -58,28 +58,36 @@ endfunction
 function! RobotsStatusline()   "{{{1
     if s:showKeys
         let s:showKeys = v:false
-        return printf('%%=%%#Normal#you:%%#RobotsPlayer#%s ' .
-                    \ '%%#Normal#robot:%%#RobotsRobot#%s ' .
-                    \ '%%#Normal#junk pile:%%#RobotsJunkPile#%s '.
-                    \ '%%#Normal#portal:%%#RobotsSafePortals#%s %%#RobotsRiskyPortals#%s ' .
-                    \ '%%#Normal#Move:%%#RobotsHighlight#yujkbn ' .
-                    \ '%%#Normal#Wait:%%#RobotsHighlight#w ' .
-                    \ '%%#Normal#Transport:%%#RobotsHighlight#t ' .
-                    \ '%%#Normal#Decoy:%%#RobotsHighlight#d ' .
-                    \ '%%#Normal#Finish:%%#RobotsHighlight#F%%=',
+        return printf('%%#Normal#'.
+                    \ '%%='.
+                    \ 'you:'.      '%%#RobotsPlayer#'.      '%s'.    '%%#Normal# '.
+                    \ 'robot:'.    '%%#RobotsRobot#'.       '%s'.    '%%#Normal# '.
+                    \ 'junk pile:'.'%%#RobotsJunkPile#'.    '%s'.    '%%#Normal# '.
+                    \ 'portal:'.   '%%#RobotsSafePortals#'. '%s '.
+                    \              '%%#RobotsRiskyPortals#'.'%s'.    '%%#Normal#  '.
+                    \ 'Move:'.     '%%#RobotsHighlight#'.   'yujkbn'.'%%#Normal# '.
+                    \ 'Wait:'.     '%%#RobotsHighlight#'.   'w'.     '%%#Normal# '.
+                    \ 'Transport:'.'%%#RobotsHighlight#'.   't'.     '%%#Normal# '.
+                    \ 'Decoy:'.    '%%#RobotsHighlight#'.   'd'.     '%%#Normal# '.
+                    \ 'Finish:'.   '%%#RobotsHighlight#'.   'F'.     '%%#Normal#'.
+                    \ '%%=',
                     \ g:robots_player,
                     \ g:robots_robot,
                     \ g:robots_junk_pile,
                     \ g:robots_safe_portals,
                     \ g:robots_risky_portals)
     endif
-    return printf('%%=%%#Normal#Score:%%#RobotsHighlight#%d ' .
-                \ '%%#Normal#Robots:%%#RobotsHighlight#%d%%#Normal#/%%#RobotsHighlight#%d ' .
-                \ '%%#Normal#Shield:%s%d%%%% ' .
-                \ '%%#Normal#Decoy:%%#RobotsHighlight#%d ' .
-                \ '%%#Normal#Level:%%#RobotsHighlight#%d  ' .
-                \ '%s%s' .
-                \ '%%=%%#RobotsHighlight#?%%#Normal#:Help',
+    return printf('%%#Normal#'.
+                \ '%%='.
+                \ 'Score:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
+                \ 'Robots:'.'%%#RobotsHighlight#'.'%d'.    '%%#Normal#'.
+                \       '/'.'%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
+                \ 'Shield:'.'%s'.                 '%d%%%%'.'%%#Normal# '.
+                \ 'Decoy:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
+                \ 'Level:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal#  '.
+                \           '%s'.                 '%s'.
+                \ '%%='.
+                \           '%%#RobotsHighlight#'.'?'.     '%%#Normal#'.':Help',
                 \ s:score,
                 \ len(s:robotsPos), s:RobotCount(),
                 \ s:shield<s:shieldFull ? '%#RobotsRiskyTransport#' : '%#RobotsSafeTransport#',
