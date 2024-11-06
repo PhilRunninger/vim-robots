@@ -29,7 +29,7 @@ highlight RobotsSafePortals                ctermfg=25           guifg=#005fff
 highlight RobotsSafePortalsMsg             ctermfg=25           guifg=#0087ff
 highlight RobotsRiskyPortals               ctermfg=196          guifg=#af0000
 highlight RobotsRiskyPortalsMsg            ctermfg=196          guifg=#ff0000
-highlight RobotsSafeTransport   cterm=bold ctermfg=34  gui=bold guifg=#00af00
-highlight RobotsRiskyTransport  cterm=bold ctermfg=160 gui=bold guifg=#df0000
+highlight RobotsGreen           cterm=bold ctermfg=34  gui=bold guifg=#00af00
+highlight RobotsRed             cterm=bold ctermfg=160 gui=bold guifg=#df0000
 highlight RobotsHighlight       cterm=bold ctermfg=172 gui=bold guifg=#df8700
 highlight RobotsEmpty                      ctermfg=243          guifg=#949494

@@ -79,21 +79,22 @@ function! RobotsStatusline()   "{{{1
     endif
     return printf('%%#Normal#'.
                 \ '%%='.
-                \ 'Score:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
+                \ 'Level:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
                 \ 'Robots:'.'%%#RobotsHighlight#'.'%d'.    '%%#Normal#'.
                 \       '/'.'%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
                 \ 'Shield:'.'%s'.                 '%d%%%%'.'%%#Normal# '.
-                \ 'Decoy:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
-                \ 'Level:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal#  '.
+                \ 'Decoy:'. '%s'.                 '%d'.    '%%#Normal# '.
+                \ 'Score:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal#  '.
                 \           '%s'.                 '%s'.
                 \ '%%='.
                 \           '%%#RobotsHighlight#'.'?'.     '%%#Normal#'.':Help',
-                \ s:score,
-                \ len(s:robotsPos), s:RobotCount(),
-                \ s:shield<s:shieldFull ? '%#RobotsRiskyTransport#' : '%#RobotsSafeTransport#',
-                \ 100*s:shield/s:shieldFull,
-                \ s:decoy.used || s:shield<s:shieldFull ? 0 : 1,
                 \ s:level,
+                \ len(s:robotsPos), s:RobotCount(),
+                \ s:shield<s:shieldFull ? '%#RobotsRed#' : '%#RobotsGreen#',
+                \ 100*s:shield/s:shieldFull,
+                \ s:decoy.used || s:shield<s:shieldFull ? '%#RobotsRed#' :  '%#RobotsGreen#',
+                \ s:decoy.used || s:shield<s:shieldFull ? 0 : 1,
+                \ s:score,
                 \ s:level < s:levelPortalsAllowRobots ? '%#RobotsSafePortalsMsg#' : '%#RobotsRiskyPortalsMsg#',
                 \ s:level < s:levelPortalsOn ? '' :
                     \ s:level < s:levelPortalsAllowRobots ? 'Portals are active.' : 'Watch out! Robots can use portals now.')
