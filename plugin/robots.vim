@@ -5,6 +5,7 @@ command! Robots :call <SID>InitAndStartRobots()   "{{{1
 function! s:InitAndStartRobots()   "{{{1
     let g:robots_empty         = get(g:, 'robots_empty',         '·')
     let g:robots_robot         = get(g:, 'robots_robot',         '■')
+    let g:robots_boss          = get(g:, 'robots_boss',          '🞕')
     let g:robots_junk_pile     = get(g:, 'robots_junk_pile',     '▲')
     let g:robots_player        = get(g:, 'robots_player',        '●')
     let g:robots_capture       = get(g:, 'robots_capture',       '🕱')
@@ -32,9 +33,9 @@ function! s:InitAndStartRobots()   "{{{1
     set nohlsearch              " 'hlsearch' is a global setting
     call s:SetStatusline(v:true)
 
-    for [keys, deltaRow, deltaCol] in [ [['1','b'],1,-1], [['2','j'],2,0], [['3','n'],1,1], [['7','y'],-1,-1], [['8','k'],-2,0], [['9','u'],-1,1] ]
+    for [keys, delta] in [ [['1','b'],[1,-1]], [['2','j'],[2,0]], [['3','n'],[1,1]], [['7','y'],[-1,-1]], [['8','k'],[-2,0]], [['9','u'],[-1,1]] ]
         for key in keys
-            call execute('nnoremap <buffer> <nowait> <silent> '.key.' :call <SID>MovePlayer('.deltaRow.','.deltaCol.')<CR>')
+            call execute('nnoremap <buffer> <nowait> <silent> '.key.' :call <SID>MovePlayer('.string(delta).')<CR>')
         endfor
     endfor
     nnoremap <buffer> <silent> 4 <nop>
@@ -61,10 +62,9 @@ function! RobotsStatusline()   "{{{1
         return printf('%%#Normal#'.
                     \ '%%='.
                     \ 'you:'.      '%%#RobotsPlayer#'.      '%s'.    '%%#Normal# '.
-                    \ 'robot:'.    '%%#RobotsRobot#'.       '%s'.    '%%#Normal# '.
+                    \ 'robot:'.    '%%#RobotsRobot#'.       '%s '.   '%%#RobotsBossRobot#'.   '%s'. '%%#Normal#  '.
                     \ 'junk pile:'.'%%#RobotsJunkPile#'.    '%s'.    '%%#Normal# '.
-                    \ 'portal:'.   '%%#RobotsSafePortals#'. '%s '.
-                    \              '%%#RobotsRiskyPortals#'.'%s'.    '%%#Normal#  '.
+                    \ 'portal:'.   '%%#RobotsSafePortals#'. '%s '.   '%%#RobotsRiskyPortals#'.'%s'. '%%#Normal#  '.
                     \ 'Move:'.     '%%#RobotsHighlight#'.   'yujkbn'.'%%#Normal# '.
                     \ 'Wait:'.     '%%#RobotsHighlight#'.   'w'.     '%%#Normal# '.
                     \ 'Transport:'.'%%#RobotsHighlight#'.   't'.     '%%#Normal# '.
@@ -72,10 +72,9 @@ function! RobotsStatusline()   "{{{1
                     \ 'Finish:'.   '%%#RobotsHighlight#'.   'F'.     '%%#Normal#'.
                     \ '%%=',
                     \ g:robots_player,
-                    \ g:robots_robot,
+                    \ g:robots_robot, g:robots_boss,
                     \ g:robots_junk_pile,
-                    \ g:robots_safe_portals,
-                    \ g:robots_risky_portals)
+                    \ g:robots_safe_portals, g:robots_risky_portals)
     endif
     return printf('%%#Normal#'.
                 \ '%%='.
@@ -83,17 +82,16 @@ function! RobotsStatusline()   "{{{1
                 \ 'Robots:'.'%%#RobotsHighlight#'.'%d'.    '%%#Normal#'.
                 \       '/'.'%%#RobotsHighlight#'.'%d'.    '%%#Normal# '.
                 \ 'Shield:'.'%s'.                 '%d%%%%'.'%%#Normal# '.
-                \ 'Decoy:'. '%s'.                 '%d'.    '%%#Normal# '.
+                \ 'Decoy:'. '%s'.                 '%s'.    '%%#Normal# '.
                 \ 'Score:'. '%%#RobotsHighlight#'.'%d'.    '%%#Normal#  '.
                 \           '%s'.                 '%s'.
                 \ '%%='.
                 \           '%%#RobotsHighlight#'.'?'.     '%%#Normal#'.':Help',
                 \ s:level,
-                \ len(s:robotsPos), s:RobotCount(),
-                \ s:shield<s:shieldFull ? '%#RobotsRed#' : '%#RobotsGreen#',
-                \ 100*s:shield/s:shieldFull,
-                \ s:decoy.used || s:shield<s:shieldFull ? '%#RobotsRed#' :  '%#RobotsGreen#',
-                \ s:decoy.used || s:shield<s:shieldFull ? 0 : 1,
+                \ len(s:robotsPos)+len(s:bossPos), s:RobotCount()+s:RobotCount('boss'),
+                \ s:shield<s:shieldFull ? '%#RobotsRed#' : '%#RobotsGreen#', 100*s:shield/s:shieldFull,
+                \ s:decoy.used || s:shield<s:shieldFull ? '%#RobotsRed#' : '%#RobotsGreen#',
+                \ s:decoy.used || s:shield<s:shieldFull ? '🔴' : '🟢',
                 \ s:score,
                 \ s:level < s:levelPortalsAllowRobots ? '%#RobotsSafePortalsMsg#' : '%#RobotsRiskyPortalsMsg#',
                 \ s:level < s:levelPortalsOn ? '' :
@@ -116,24 +114,27 @@ function! s:StartNewLevel()   "{{{1
     let s:decoy = {'used':v:false, 'expiration':min([float2nr(floor(s:shield/s:shieldFull) + 1),10])}
 
     let s:finishingLevel = v:false
-    let l:startPt = exists('s:playerPos') ? s:ToScreenPosition(s:playerPos) : [s:height/2, s:width/2]
+    let startPt = exists('s:playerPos') ? s:ScreenCoords(s:playerPos) : [s:height/2, s:width/2]
 
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
-    call s:Bezier(l:startPt, s:ToScreenPosition(s:playerPos))
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 1, g:robots_player, 2, 1)
+    call s:Bezier(startPt, s:ScreenCoords(s:playerPos))
+    call s:DrawTransporterBeam(s:ScreenCoords(s:playerPos), 1, g:robots_player, 2, 1)
     call s:DrawAll(s:robotsPos, g:robots_robot, 10)
+    call s:DrawAll(s:bossPos, g:robots_boss, 10)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 endfunction
 
-function! s:RobotCount()   "{{{1
-    let l:cells = (s:rows * s:cols / 2)  " # of cells on the board
-    return float2nr(l:cells / 2 * tanh((s:level) / pow(l:cells, 2.0/3.0)))
+function! s:RobotCount(type = 'robot')   "{{{1
+    let cells = (s:rows * s:cols / 2)  " # of cells on the board
+    let count = cells / (a:type == 'boss' ? 10 : 2) * tanh((s:level - (a:type == 'boss') * 5) / pow(cells, 2.0/3.0))
+    return max([0, float2nr(count)])
 endfunction
 
 function! s:CreateRobotsAndPlayer()   "{{{1
     let s:junkPilesPos = []
     let s:robotsPos = []
+    let s:bossPos = []
     for i in range(1,s:RobotCount())
         call add(s:robotsPos, s:RandomPosition())
         while count(s:robotsPos, s:robotsPos[-1]) == 2
@@ -141,8 +142,15 @@ function! s:CreateRobotsAndPlayer()   "{{{1
         endwhile
     endfor
 
+    for i in range(1,s:RobotCount('boss'))
+        call add(s:bossPos, s:RandomPosition())
+        while count(s:robotsPos, s:bossPos[-1]) == 2 || count(s:bossPos, s:bossPos[-1]) == 2
+            let s:bossPos[-1] = s:RandomPosition()
+        endwhile
+    endfor
+
     let s:playerPos = s:RandomPosition()
-    while count(s:robotsPos, s:playerPos) == 1
+    while count(s:robotsPos, s:playerPos) == 1 || count(s:bossPos, s:playerPos) == 1
         let s:playerPos = s:RandomPosition()
     endwhile
 endfunction
@@ -192,8 +200,8 @@ function! s:Empty(position)   "{{{1
 endfunction
 
 function! s:UpdateScore(deltaScore)   "{{{1
+    let s:shield += (a:deltaScore * (s:finishingLevel ? 1 : 0))
     let s:score += (a:deltaScore * (s:finishingLevel ? 2 : 1))
-    let l:shield = trim(trim(printf('%.3f', 1.0*s:shield/s:shieldFull), '0', 2), '.', 2)
 endfunction
 
 function! s:DrawAt(position, text)   "{{{1
@@ -213,7 +221,7 @@ endfunction
 
 function! s:DrawAll(positions, character, delay=0)   "{{{1
     for position in a:positions
-        call s:DrawAt(s:ToScreenPosition(position), a:character)
+        call s:DrawAt(s:ScreenCoords(position), a:character)
         if a:delay > 0
             redraw
             execute 'sleep '.a:delay.'m'
@@ -231,27 +239,26 @@ function! s:RandomSparkle()   "{{{1
     return strcharpart(g:robots_sparkles, Random(strchars(g:robots_sparkles)), 1)
 endfunction
 
-function! s:ToScreenPosition(position)   "{{{1
+function! s:ScreenCoords(position)   "{{{1
     let [r,c] = a:position
     return [r+1, 3*c+1]
 endfunction
 
-function! s:NewPosition(position, deltaRow, deltaCol, forWhom)   "{{{1
-    let [r,c] = a:position
-    let r += a:deltaRow
-    let c += a:deltaCol
+function! s:NewPosition(oldPosition, delta, forWhom)   "{{{1
+    let r = a:oldPosition[0] + a:delta[0]
+    let c = a:oldPosition[1] + a:delta[1]
     if (r < 0 && s:PortalsAreOpen(s:TOP, a:forWhom)) ||
      \ (r >= s:rows && s:PortalsAreOpen(s:BOTTOM, a:forWhom))
         let r = (r + s:rows) % s:rows
     elseif r < 0 || r >= s:rows
-        return a:position
+        return a:oldPosition
     endif
 
     if (c < 0 && s:PortalsAreOpen(s:LEFT, a:forWhom)) ||
      \ (c >= s:cols && s:PortalsAreOpen(s:RIGHT, a:forWhom))
         let c = (c + s:cols) % s:cols
     elseif c < 0 || c >= s:cols
-        return a:position
+        return a:oldPosition
     endif
 
     return [r,c]
@@ -264,22 +271,19 @@ function! s:WaitOneTurn()   "{{{1
 endfunction
 
 function! s:Transport()   "{{{1
-    let l:startPt = s:ToScreenPosition(s:playerPos)
-    call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 2, s:Empty(s:playerPos), 1, 1)
+    let startPt = s:ScreenCoords(s:playerPos)
+    call s:DrawTransporterBeam(s:ScreenCoords(s:playerPos), 2, s:Empty(s:playerPos), 1, 1)
     let s:playerPos = s:RandomPosition()
-    if s:shield >= s:shieldFull
-        while count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
+    while s:shield >= s:shieldFull &&
+        \ (count(s:robotsPos, s:playerPos) > 0 || count(s:bossPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0)
             let s:playerPos = s:RandomPosition()
-        endwhile
-        let s:shield -= s:shieldFull
-    else
-        let s:shield = 0
-    endif
-    let l:endPt = s:ToScreenPosition(s:playerPos)
-    call s:Bezier(l:startPt, l:endPt)
+    endwhile
+    let s:shield = max([0, s:shield - s:shieldFull])
+    let endPt = s:ScreenCoords(s:playerPos)
+    call s:Bezier(startPt, endPt)
 
     if !s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 1, g:robots_player, 2, 1)
+        call s:DrawTransporterBeam(s:ScreenCoords(s:playerPos), 1, g:robots_player, 2, 1)
     endif
     call s:UpdateScore(0)
     call s:Continue()
@@ -346,7 +350,7 @@ function! s:DrawAndExpireDecoy()   "{{{1
     endif
 
     let s:decoy.expiration -= 1
-    let [row,col] = s:ToScreenPosition(s:decoy.pos)
+    let [row,col] = s:ScreenCoords(s:decoy.pos)
 
     for [dr,dc] in [[-1,-1],[-1,1],[0,-2],[0,2],[1,-1],[1,1]]
         call s:DrawAt([row+dr,col+dc], s:decoy.expiration < 0 ? ' ' : s:decoy.expiration)
@@ -390,15 +394,15 @@ function! s:DrawSparkles(cells, sparkles=[])
     endfor
 endfunction
 
-function! s:MovePlayer(deltaRow, deltaCol)   "{{{1
-    let newPos = s:NewPosition(s:playerPos, a:deltaRow, a:deltaCol, 'player')
+function! s:MovePlayer(delta)   "{{{1
+    let newPos = s:NewPosition(s:playerPos, a:delta, 'player')
     if count(s:robotsPos, newPos) > 0 || count(s:junkPilesPos, newPos) > 0 || newPos == s:playerPos
         return
     endif
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), s:Empty(s:playerPos))
+    call s:DrawAt(s:ScreenCoords(s:playerPos), s:Empty(s:playerPos))
     let s:playerPos = newPos
     call s:DrawAndExpireDecoy()
-    call s:DrawAt(s:ToScreenPosition(s:playerPos), g:robots_player)
+    call s:DrawAt(s:ScreenCoords(s:playerPos), g:robots_player)
     call s:MoveRobots()
     call s:Continue()
 endfunction
@@ -408,82 +412,107 @@ function! s:Sign(num)   "{{{1
 endfunction
 
 function! s:MoveRobots()   "{{{1
-    let newRobotPos = []
     let target = s:decoy.used && s:decoy.expiration >= 0 ? s:decoy.pos : s:playerPos
-
-    for robot in s:robotsPos
-        let deltaRow = robot==target ? 0 : (target[0]==robot[0] ? 2*Random(2)-1 : target[0]-robot[0])
-        let deltaCol = robot==target ? 0 : (target[1] - robot[1])
-
-        if s:PortalsAreOpen(s:TOP, 'robot') && abs(deltaRow-s:rows) < abs(deltaRow) " wrap-around going up
-            let deltaRow = -1
-        elseif s:PortalsAreOpen(s:BOTTOM, 'robot') && abs(deltaRow+s:rows) < abs(deltaRow) " wrap-around going down
-            let deltaRow = 1
-        elseif robot[0]>0 && robot[0]<s:rows - 1 " middle of the field
-            let deltaRow = s:Sign(deltaRow)
-        else
-            let deltaRow = robot[0]==0 ? 1 : -1 " on the edge, no wrap-around
+    let newRobotPos = map(copy(s:robotsPos), {_,v -> s:NewPosition(v, s:RobotDelta(v,target), 'robot')})
+    let newBossPos = map(copy(s:bossPos), {_,v -> s:NewPosition(v, s:RobotDelta(v,target), 'robot')})
+    " Move bosses back if they would collide with a robot or another boss.
+    for i in range(len(newBossPos))
+        if count(newRobotPos, newBossPos[i]) > 0 || count(newBossPos,newBossPos[i]) > 1
+            let newBossPos[i] = s:bossPos[i]
         endif
-        let deltaRow *= (deltaCol == 0 ? 2 : 1) " going straight up or down is two rows, not one.
+    endfor
 
-        if s:PortalsAreOpen(s:LEFT, 'robot') && abs(deltaCol-s:cols) < abs(deltaCol) " wrap-around going left
-            let deltaCol = -1
-        elseif s:PortalsAreOpen(s:RIGHT, 'robot') && abs(deltaCol+s:cols) < abs(deltaCol) "wrap-around going right
-            let deltaCol = 1
-        else
-            let deltaCol = s:Sign(deltaCol) " no wrap-around
-        endif
-
-        let newPos = s:NewPosition(robot, deltaRow, deltaCol, 'robot')
-        if count(s:junkPilesPos, newPos) == 0
-            call add(newRobotPos, newPos)
-        else
-            if s:finishingLevel
-                let s:shield += 1
-            endif
+    " Remove robots that walk into junk piles
+    for i in range(len(newRobotPos)-1, 0, -1)
+        if count(s:junkPilesPos, newRobotPos[i]) > 0
+            call remove(newRobotPos, i)
             call s:UpdateScore(1)
         endif
     endfor
 
+    " Remove bosses that walk into junk piles
+    for i in range(len(newBossPos)-1, 0, -1)
+        if count(s:junkPilesPos, newBossPos[i]) > 0
+            call remove(newBossPos, i)
+            call s:UpdateScore(1)
+        endif
+    endfor
+
+    " Create new junk piles where there are collisions.
+    let robotCollisions = map(copy(newRobotPos), {_,v -> count(newRobotPos+newBossPos, v)})
+    let bossCollisions = map(copy(newBossPos), {_,v -> count(newRobotPos+newBossPos, v)})
+    for i in range(len(robotCollisions)-1, 0, -1)
+        if robotCollisions[i] > 1
+            call add(s:junkPilesPos, newRobotPos[i])
+            call remove(newRobotPos, i)
+            call s:UpdateScore(1)
+        endif
+    endfor
+    for i in range(len(bossCollisions)-1, 0, -1)
+        if bossCollisions[i] > 1
+            call add(s:junkPilesPos, newBossPos[i])
+            call remove(newBossPos, i)
+            call s:UpdateScore(1)
+        endif
+    endfor
+    call uniq(sort(s:junkPilesPos))
+
+    " Redraw robots, bosses, and junk piles.
     for position in s:robotsPos
-        call s:DrawAt(s:ToScreenPosition(position), s:Empty(position))
+        call s:DrawAt(s:ScreenCoords(position), s:Empty(position))
     endfor
     let s:robotsPos = newRobotPos
+    for position in s:bossPos
+        call s:DrawAt(s:ScreenCoords(position), s:Empty(position))
+    endfor
+    let s:bossPos = newBossPos
+
     call s:DrawAll(s:robotsPos, g:robots_robot)
-    call s:CreateJunkPiles()
+    call s:DrawAll(s:bossPos, g:robots_boss)
     call s:DrawAll(s:junkPilesPos, g:robots_junk_pile)
 endfunction
 
-function! s:CreateJunkPiles()   "{{{1
-    let kills = 0
-    let collisions = map(copy(s:robotsPos), {_,v -> count(s:robotsPos, v)})
-    for i in range(len(collisions)-1, 0, -1)
-        if collisions[i] > 1
-            call add(s:junkPilesPos, s:robotsPos[i])
-            call remove(s:robotsPos, i)
-            let kills += 1
-        endif
-    endfor
-    let s:junkPilesPos = uniq(sort(s:junkPilesPos))
-    let s:shield += (s:finishingLevel ? kills : 0)
-    call s:UpdateScore(kills)
+function! s:RobotDelta(robot, target)   "{{{1
+    let deltaRow = a:robot==a:target ? 0 : (a:target[0]==a:robot[0] ? 2*Random(2)-1 : a:target[0]-a:robot[0])
+    let deltaCol = a:robot==a:target ? 0 : (a:target[1] - a:robot[1])
+
+    if s:PortalsAreOpen(s:TOP, 'robot') && abs(deltaRow-s:rows) < abs(deltaRow) " wrap-around going up
+        let deltaRow = -1
+    elseif s:PortalsAreOpen(s:BOTTOM, 'robot') && abs(deltaRow+s:rows) < abs(deltaRow) " wrap-around going down
+        let deltaRow = 1
+    elseif a:robot[0]>0 && a:robot[0]<s:rows - 1 " middle of the field
+        let deltaRow = s:Sign(deltaRow)
+    else
+        let deltaRow = a:robot[0]==0 ? 1 : -1 " on the edge, no wrap-around
+    endif
+    let deltaRow *= (deltaCol == 0 ? 2 : 1) " going straight up or down is two rows, not one.
+
+    if s:PortalsAreOpen(s:LEFT, 'robot') && abs(deltaCol-s:cols) < abs(deltaCol) " wrap-around going left
+        let deltaCol = -1
+    elseif s:PortalsAreOpen(s:RIGHT, 'robot') && abs(deltaCol+s:cols) < abs(deltaCol) "wrap-around going right
+        let deltaCol = 1
+    else
+        let deltaCol = s:Sign(deltaCol) " no wrap-around
+      endif
+
+    return [deltaRow, deltaCol]
 endfunction
 
 function! s:GameOver()   "{{{1
-    return count(s:robotsPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
+    return count(s:robotsPos, s:playerPos) > 0 || count(s:bossPos, s:playerPos) > 0 || count(s:junkPilesPos, s:playerPos) > 0
 endfunction
 
 function! s:PlayerWinsLevel()   "{{{1
-    return len(s:robotsPos) == 0
+    return len(s:robotsPos) == 0 && len(s:bossPos) == 0
 endfunction
 
 function! s:Continue()   "{{{1
     if s:GameOver()
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 0, g:robots_capture, 0, 0)
+        call s:DrawTransporterBeam(s:ScreenCoords(s:playerPos), 0, g:robots_capture, 0, 0)
         call s:PlayAnother()
     elseif s:PlayerWinsLevel()
         call s:DrawAll(s:junkPilesPos, g:robots_empty, 25)
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 2, s:Empty(s:playerPos), 0, 1)
+        call s:DrawTransporterBeam(s:ScreenCoords(s:playerPos), 2, s:Empty(s:playerPos), 0, 1)
         call s:StartNewLevel()
     endif
 endfunction
@@ -495,7 +524,7 @@ function! s:PlayAnother()   "{{{1
     setlocal nomodifiable
     redraw!
     if nr2char(getchar()) ==? 'y'
-        call s:DrawTransporterBeam(s:ToScreenPosition(s:playerPos), 2, s:Empty(s:playerPos), 1, 1)
+        call s:DrawTransporterBeam(s:ScreenCoords(s:playerPos), 2, s:Empty(s:playerPos), 1, 1)
         call s:StartNewGame()
     else
         let &hlsearch = s:hlsearch

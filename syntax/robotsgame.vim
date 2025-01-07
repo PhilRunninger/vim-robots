@@ -1,3 +1,4 @@
+execute printf('syntax match RobotsBossRobot /%s/',     g:robots_boss)
 execute printf('syntax match RobotsRobot /%s/',         g:robots_robot)
 execute printf('syntax match RobotsPlayer /%s/',        g:robots_player)
 execute printf('syntax match RobotsPlayerCapture /%s/', g:robots_capture)
@@ -20,6 +21,7 @@ for i in range(s:color_count)
 endfor
 
 highlight RobotsRobot           cterm=bold ctermfg=165 gui=bold guifg=#d700ff
+highlight RobotsBossRobot       cterm=bold ctermfg=93  gui=bold guifg=#8700ff
 highlight RobotsPlayer          cterm=bold ctermfg=40  gui=bold guifg=#00df00
 highlight RobotsDecoy           cterm=bold ctermfg=28  gui=bold guifg=#008700
 highlight RobotsJunkPile        cterm=bold ctermfg=208 gui=bold guifg=#ff8700
