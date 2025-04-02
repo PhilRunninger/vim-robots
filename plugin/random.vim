@@ -6,7 +6,7 @@
 " Without a parameter, this function returns a number in the range [0,1).
 " With an integer parameter, n, it returns an integer in the range [0,n-1].
 
-let s:state = float2nr(fmod(reltimefloat(reltime()),1) * 1.0e7)
+let s:state = max([1, float2nr(fmod(reltimefloat(reltime()),1) * 1.0e7)])
 
 function! Random(...)
     if a:0 && (type(a:1) != v:t_number || a:1 < 1)
