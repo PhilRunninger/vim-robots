@@ -116,6 +116,7 @@ function! s:StartNewLevel()   "{{{1
     let s:finishingLevel = v:false
     let startPt = exists('s:playerPos') ? s:ScreenCoords(s:playerPos) : [s:height/2, s:width/2]
 
+    call s:CreateWall()
     call s:CreateRobotsAndPlayer()
     call s:DrawGrid()
     call s:Bezier(startPt, s:ScreenCoords(s:playerPos))
@@ -131,26 +132,30 @@ function! s:RobotCount(type = 'robot')   "{{{1
     return max([0, float2nr(count)])
 endfunction
 
+function! s:CreateWall()   "{{{1
+    let s:wall = [[4,5],[6,5],[8,5],[10,5],[11,6],[12,7],[11,8]]
+endfunction
+
 function! s:CreateRobotsAndPlayer()   "{{{1
     let s:junkPilesPos = []
     let s:robotsPos = []
     let s:bossPos = []
     for i in range(1,s:RobotCount())
         call add(s:robotsPos, s:RandomPosition())
-        while count(s:robotsPos, s:robotsPos[-1]) == 2
+        while count(s:robotsPos, s:robotsPos[-1]) == 2 || count(s:wall, s:robotsPos[-1]) > 0
             let s:robotsPos[-1] = s:RandomPosition()
         endwhile
     endfor
 
     for i in range(1,s:RobotCount('boss'))
         call add(s:bossPos, s:RandomPosition())
-        while count(s:robotsPos, s:bossPos[-1]) == 2 || count(s:bossPos, s:bossPos[-1]) == 2
+        while count(s:robotsPos, s:bossPos[-1]) == 2 || count(s:bossPos, s:bossPos[-1]) == 2 || count(s:wall, s:robotsPos[-1]) > 0
             let s:bossPos[-1] = s:RandomPosition()
         endwhile
     endfor
 
     let s:playerPos = s:RandomPosition()
-    while count(s:robotsPos, s:playerPos) == 1 || count(s:bossPos, s:playerPos) == 1
+    while count(s:robotsPos, s:playerPos) == 1 || count(s:bossPos, s:playerPos) == 1 || count(s:wall, s:robotsPos[-1]) > 0
         let s:playerPos = s:RandomPosition()
     endwhile
 endfunction
@@ -160,6 +165,33 @@ function! s:DrawGrid()   "{{{1
     silent normal! ggdG
     for r in range(1,s:rows,1)
         call append(0, (r%2 ? '':'   ').trim(repeat(g:robots_empty.'     ',s:cols/2), ' ').(r%2 ? '   ':''))
+    endfor
+
+    call s:DrawAll(s:wall, '█')
+    for i in range(len(s:wall)-1)
+        let [r0,c0] = s:ScreenCoords(s:wall[i])
+        let [r1,c1] = s:ScreenCoords(s:wall[i+1])
+        echomsg printf('%d: [%d,%d] -> [%d,%d]', i,r0,c0, r1,c1)
+
+        if r1 > r0 && c1 == c0              " Down
+            call s:DrawAt([r0+1,c0], '█')
+        elseif r1 < r0 && c1 == c0          " Up
+            call s:DrawAt([r0-1,c0], '█')
+
+        elseif r1 > r0 && c1 < c0           " Left & Down
+            call s:DrawAt([r0,  c0-2], '▃▅')
+            call s:DrawAt([r0+1,c0-2], '▃▅')
+        elseif r1 < r0 && c1 < c0           " Left & Up
+            call s:DrawAt([r0-1,c0-2], '▅▃')
+            call s:DrawAt([r0,  c0-2], '▅▃')
+
+        elseif r1 > r0 && c1 > c0           " Right & Down
+            call s:DrawAt([r0,  c0+1], '▅▃')
+            call s:DrawAt([r0+1,c0+1], '▅▃')
+        elseif r1 < r0 && c1 > c0           " Right & Up
+            call s:DrawAt([r0-1,c0+1], '▃▅')
+            call s:DrawAt([r0,  c0+1], '▃▅')
+        endif
     endfor
 
     silent g/^$/d

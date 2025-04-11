@@ -6,8 +6,14 @@ execute printf('syntax match RobotsJunkPile /%s/',      g:robots_junk_pile)
 execute printf('syntax match RobotsEmpty /%s/',         g:robots_empty)
 execute printf('syntax match RobotsSafePortals /%s/',   g:robots_safe_portals)
 execute printf('syntax match RobotsRiskyPortals /%s/',  g:robots_risky_portals)
-execute printf("syntax match RobotsDecoy /[-.'|0-9]/")
-execute printf('syntax match RobotsGameOver /\(GAME OVER\|Play Again?\)/')
+
+syntax match RobotsDecoy /[-.'|0-9]/
+syntax match RobotsGameOver /\(GAME OVER\|Play Again?\)/
+
+syntax match RobotsWall /[█]/
+syntax match RobotsWallReverse /\s\zs▅▃/
+syntax match RobotsWallReverse /▃▅\ze\(\s\|$\)/
+hi RobotsWallReverse gui=reverse
 
 let s:color_count = 40
 for i in range(strchars(g:robots_sparkles))
